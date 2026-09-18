@@ -7,6 +7,7 @@ Theory Company rental site, hosted at [vibmehta.com](https://vibmehta.com). Bran
 | Page | URL |
 | --- | --- |
 | Homepage | https://vibmehta.com/ |
+| Requirements | https://vibmehta.com/requirements |
 | Application | https://vibmehta.com/apply |
 | Fremont listing | https://vibmehta.com/apply?listing=fremont |
 | Landlord inbox | https://vibmehta.com/admin |

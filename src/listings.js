@@ -10,14 +10,16 @@ export const LISTINGS = [
     id: "fremont",
     publicName: "Fremont home",
     publicLocation: "Fremont, CA",
+    facts: "3 bed · 2 bath · single-family",
   },
 ];
 
 export function publicListings() {
-  return LISTINGS.map(({ id, publicName, publicLocation }) => ({
+  return LISTINGS.map(({ id, publicName, publicLocation, facts }) => ({
     id,
     publicName,
     publicLocation,
+    facts,
   }));
 }
 

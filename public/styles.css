@@ -90,6 +90,11 @@ footer:not(.site-footer) {
   font-size: 0.8rem;
 }
 
+.nav {
+  display: flex;
+  gap: 18px;
+}
+
 .nav a {
   color: var(--ink);
   text-decoration: none;
@@ -162,10 +167,20 @@ h1 {
   background: var(--clay-deep);
 }
 
+.btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.btn-secondary:hover {
+  background: var(--card);
+}
+
 .listing-grid {
   display: grid;
   gap: 16px;
-  padding: 8px 0 72px;
+  padding: 8px 0 48px;
 }
 
 .home-listing {
@@ -191,6 +206,68 @@ h1 {
 .listing-cta {
   font-weight: 600;
   color: var(--clay);
+}
+
+.section-title {
+  margin: 0 0 12px;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+}
+
+.req-section {
+  padding: 8px 0 72px;
+}
+
+.req-note {
+  max-width: 38rem;
+  margin: 0 0 24px;
+  color: var(--muted);
+}
+
+.req-note a,
+.req-banner a {
+  color: var(--ink);
+}
+
+.req-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.req-item {
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: 4px 4px 20px 4px;
+  background: var(--card);
+}
+
+.req-item h3 {
+  margin: 0 0 8px;
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 500;
+}
+
+.req-item p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.req-banner {
+  margin: 20px 0 0;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 4px 4px 16px 4px;
+  background: var(--card);
+}
+
+.req-banner p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.req-banner strong {
+  color: var(--ink);
 }
 
 .site-footer {
@@ -383,6 +460,10 @@ footer:not(.site-footer) {
 
   .footer-inner {
     flex-direction: column;
+  }
+
+  .req-grid {
+    grid-template-columns: 1fr;
   }
 
   h1 {
