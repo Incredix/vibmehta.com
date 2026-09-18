@@ -16,7 +16,17 @@ database_name = "vibmehta-applications"
 database_id = "local-dev-placeholder"
 migrations_dir = "migrations"
 
+[[routes]]
+pattern = "vibmehta.com/*"
+zone_name = "vibmehta.com"
+
+[[routes]]
+pattern = "www.vibmehta.com/*"
+zone_name = "vibmehta.com"
+
 [vars]
 TO_EMAIL = "vibhorfall@gmail.com"
 FROM_EMAIL = "applications@vibmehta.com"
 SITE_NAME = "Vib Mehta Rentals"
+
+

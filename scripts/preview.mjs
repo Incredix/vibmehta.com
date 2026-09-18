@@ -35,6 +35,9 @@ const env = {
       const url = new URL(request.url);
       let pathname = url.pathname === "/" ? "/index.html" : url.pathname;
       if (pathname.endsWith("/")) pathname += "index.html";
+      else if (!extname(pathname) && existsSync(join(root, pathname, "index.html"))) {
+        pathname += "/index.html";
+      }
       const file = join(root, pathname);
       if (!file.startsWith(root) || !existsSync(file) || statSync(file).isDirectory()) {
         const notFound = readFileSync(join(root, "404.html"));
