@@ -1,4 +1,4 @@
-name = "vibmehta"
+name = "vibmehta-com"
 main = "src/index.js"
 compatibility_date = "2026-09-17"
 workers_dev = true
@@ -10,11 +10,13 @@ html_handling = "auto-trailing-slash"
 not_found_handling = "404-page"
 run_worker_first = ["/api/*"]
 
-[[d1_databases]]
-binding = "DB"
-database_name = "vibmehta-applications"
-database_id = "local-dev-placeholder"
-migrations_dir = "migrations"
+# D1 is optional until a real database_id is pasted below.
+# Create "vibmehta-applications" in Cloudflare, copy its UUID, uncomment, redeploy.
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "vibmehta-applications"
+# database_id = "PASTE-D1-UUID-HERE"
+# migrations_dir = "migrations"
 
 [[routes]]
 pattern = "vibmehta.com/*"
@@ -28,5 +30,3 @@ zone_name = "vibmehta.com"
 TO_EMAIL = "vibhorfall@gmail.com"
 FROM_EMAIL = "applications@vibmehta.com"
 SITE_NAME = "Theory"
-
-

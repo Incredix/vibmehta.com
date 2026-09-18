@@ -13,19 +13,20 @@ Theory Company rental site, hosted at [vibmehta.com](https://vibmehta.com). Bran
 
 ## Load this repo in Cloudflare
 
-1. Workers & Pages → Create → **Import a repository** → `vibhormehta/vibmehta.com`
-2. Leave the build command empty.
-3. Create a **D1** database named `vibmehta-applications`, bind it to the Worker as `DB`, and replace `database_id` in `wrangler.toml`.
-4. In the Worker: **Settings → Variables and Secrets**
-   - Secret `ADMIN_PASSWORD` — sign in at `/admin`
-   - Variable `LISTING_FREMONT_ADDRESS` — real street for the Fremont home
-   - Optional live credit secrets below
-5. Custom domains `vibmehta.com` and `www.vibmehta.com` are declared in `wrangler.toml`.
-6. Run D1 migrations:
+1. Workers & Pages → Import **`Incredix/vibmehta.com`**. Deploy command is `npx wrangler deploy`.
+2. Worker name must be **`vibmehta-com`** (matches Cloudflare Builds).
+3. First deploy does **not** require D1. Homepage, apply, and email work without it.
+4. For the inbox: create D1 database **`vibmehta-applications`**, paste its UUID into `wrangler.toml` (`database_id`), uncomment the `[[d1_databases]]` block, and redeploy. Then:
 
 ```bash
 npx wrangler d1 migrations apply vibmehta-applications --remote
 ```
+
+5. Worker secrets/vars:
+   - Secret `ADMIN_PASSWORD` — sign in at `/admin`
+   - Variable `LISTING_FREMONT_ADDRESS` — real street for the Fremont home
+   - Optional live credit secrets below
+6. Custom domains `vibmehta.com` and `www.vibmehta.com` are declared in `wrangler.toml`.
 
 The public site shows **Fremont home · Fremont, CA**, not the street address.
 
