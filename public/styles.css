@@ -209,9 +209,8 @@ h1 {
   gap: 24px;
 }
 
-.site-footer p {
-  margin: 8px 0 0;
-  color: #b0aea5;
+.site-footer a {
+  color: #f0eee6;
 }
 
 form {

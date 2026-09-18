@@ -27,6 +27,6 @@ zone_name = "vibmehta.com"
 [vars]
 TO_EMAIL = "vibhorfall@gmail.com"
 FROM_EMAIL = "applications@vibmehta.com"
-SITE_NAME = "Vib Mehta Rentals"
+SITE_NAME = "Theory"
 
 

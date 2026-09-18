@@ -14,7 +14,7 @@ import {
 
 const TO_EMAIL = "vibhorfall@gmail.com";
 const FROM_EMAIL = "applications@vibmehta.com";
-const SITE_NAME = "Vib Mehta Rentals";
+const SITE_NAME = "Theory";
 
 const REQUIRED = [
   "fullName",

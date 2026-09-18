@@ -23,7 +23,7 @@ const env = {
   ADMIN_PASSWORD: "local-admin",
   TO_EMAIL: "vibhorfall@gmail.com",
   FROM_EMAIL: "applications@vibmehta.com",
-  SITE_NAME: "Vib Mehta Rentals",
+  SITE_NAME: "Theory",
   ...devVars,
   EMAIL: {
     async send() {

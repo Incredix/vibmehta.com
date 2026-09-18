@@ -1,6 +1,6 @@
 # vibmehta.com
 
-Residential rental site for [vibmehta.com](https://vibmehta.com). Cloudflare Workers + static assets + D1.
+Theory Company rental site, hosted at [vibmehta.com](https://vibmehta.com). Brand is **Theory**; Vib Mehta is listed as the landlord. Cloudflare Workers + static assets + D1.
 
 ## Endpoints
 
