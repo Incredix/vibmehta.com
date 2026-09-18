@@ -14,16 +14,15 @@ Theory Company rental site, hosted at [vibmehta.com](https://vibmehta.com). Bran
 ## Load this repo in Cloudflare
 
 1. Workers & Pages → Import **`Incredix/vibmehta.com`**. Deploy command is `npx wrangler deploy`.
-2. Project / Worker name must be **`theory-vibmehta`**. Live preview: [theory-vibmehta.vibhorfall.workers.dev](https://theory-vibmehta.vibhorfall.workers.dev).
-3. Delete the old Worker **`vibmehta-com`** (or its `vibmehta.com` / `www.vibmehta.com` routes). Then on **theory-vibmehta** → Settings → Domains & Routes, add `vibmehta.com` and `www.vibmehta.com`.
-4. First deploy does **not** require D1. Homepage, apply, and email work without it.
-5. For the inbox: create D1 database **`vibmehta-applications`**, paste its UUID into `wrangler.toml` (`database_id`), uncomment the `[[d1_databases]]` block, and redeploy. Then:
+2. Name the project **`theory-vibmehta`**. `wrangler.toml` will attach `vibmehta.com` and `www.vibmehta.com`.
+3. First deploy does **not** require D1. Homepage, apply, and email work without it.
+4. For the inbox: create D1 database **`vibmehta-applications`**, paste its UUID into `wrangler.toml` (`database_id`), uncomment the `[[d1_databases]]` block, and redeploy. Then:
 
 ```bash
 npx wrangler d1 migrations apply vibmehta-applications --remote
 ```
 
-6. Worker secrets/vars:
+5. Worker secrets/vars:
    - Secret `ADMIN_PASSWORD` — sign in at `/admin`
    - Variable `LISTING_FREMONT_ADDRESS` — real street for the Fremont home
    - Optional live credit secrets below
