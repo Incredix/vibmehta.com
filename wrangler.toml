@@ -1,4 +1,4 @@
-name = "vibmehta-com"
+name = "theory-vibmehta"
 main = "src/index.js"
 compatibility_date = "2026-09-17"
 workers_dev = true

@@ -14,7 +14,7 @@ Theory Company rental site, hosted at [vibmehta.com](https://vibmehta.com). Bran
 ## Load this repo in Cloudflare
 
 1. Workers & Pages → Import **`Incredix/vibmehta.com`**. Deploy command is `npx wrangler deploy`.
-2. Worker name must be **`vibmehta-com`** (matches Cloudflare Builds).
+2. Project / Worker name must be **`theory-vibmehta`** (not `vibmehta-com` — that name is already taken on this account). If Cloudflare suggests `vibmehta-com`, type `theory-vibmehta` instead. You can leave the old `vibmehta-com` project unused.
 3. First deploy does **not** require D1. Homepage, apply, and email work without it.
 4. For the inbox: create D1 database **`vibmehta-applications`**, paste its UUID into `wrangler.toml` (`database_id`), uncomment the `[[d1_databases]]` block, and redeploy. Then:
 
