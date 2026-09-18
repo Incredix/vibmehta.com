@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rental Application · Vib Mehta</title>
+    <meta
+      name="description"
+      content="Apply to rent from Vib Mehta. Complete this application and it will be sent directly to the landlord."
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,480;9..144,600&family=Figtree:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>
+          <strong>Vib Mehta</strong>
+          <em>Residential rentals</em>
+        </span>
+      </a>
+      <p class="header-note">Equal Housing Opportunity</p>
+    </header>
+
+    <main>
+      <section class="hero">
+        <p class="eyebrow">Rental application</p>
+        <h1>Apply for the home.</h1>
+        <p class="lede">
+          Fill this out once. It is emailed to the landlord at
+          <a href="mailto:vibhorfall@gmail.com">vibhorfall@gmail.com</a>
+          as soon as you submit. There is no account to create.
+        </p>
+      </section>
+
+      <form id="application-form" novalidate>
+        <fieldset>
+          <legend>The property</legend>
+          <div class="grid">
+            <label class="span-2">
+              Property address
+              <input
+                id="propertyAddress"
+                name="propertyAddress"
+                type="text"
+                placeholder="Street, city, state"
+                autocomplete="street-address"
+              />
+            </label>
+            <label>
+              Desired move-in date
+              <input id="moveInDate" name="moveInDate" type="date" required />
+            </label>
+            <label>
+              Lease term
+              <select name="leaseTerm">
+                <option value="12 months" selected>12 months</option>
+                <option value="6 months">6 months</option>
+                <option value="Month-to-month">Month-to-month</option>
+                <option value="18 months">18 months</option>
+                <option value="24 months">24 months</option>
+              </select>
+            </label>
+            <label>
+              Monthly rent you are applying for
+              <input name="desiredRent" type="text" inputmode="decimal" placeholder="$" />
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>You</legend>
+          <div class="grid">
+            <label class="span-2">
+              Full legal name
+              <input name="fullName" type="text" required autocomplete="name" />
+            </label>
+            <label>
+              Email
+              <input name="email" type="email" required autocomplete="email" />
+            </label>
+            <label>
+              Phone
+              <input name="phone" type="tel" required autocomplete="tel" />
+            </label>
+            <label>
+              Date of birth
+              <input name="dateOfBirth" type="date" autocomplete="bday" />
+            </label>
+            <label>
+              SSN last 4
+              <input name="ssnLast4" type="text" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="••••" />
+            </label>
+            <label class="span-2">
+              Driver’s license / state ID
+              <input name="license" type="text" placeholder="State and number" />
+            </label>
+            <label class="span-2">
+              Other names used
+              <input name="otherNames" type="text" />
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Current residence</legend>
+          <div class="grid">
+            <label class="span-2">
+              Current address
+              <input name="currentAddress" type="text" required autocomplete="street-address" />
+            </label>
+            <label>
+              Time at this address
+              <input name="timeAtAddress" type="text" placeholder="e.g. 2 years" />
+            </label>
+            <label>
+              Current monthly rent
+              <input name="currentRent" type="text" inputmode="decimal" placeholder="$" />
+            </label>
+            <label>
+              Current landlord / manager
+              <input name="landlordName" type="text" />
+            </label>
+            <label>
+              Landlord phone
+              <input name="landlordPhone" type="tel" />
+            </label>
+            <label class="span-2">
+              Reason for leaving
+              <input name="reasonLeaving" type="text" />
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Work and income</legend>
+          <div class="grid">
+            <label class="span-2">
+              Employer
+              <input name="employer" type="text" required autocomplete="organization" />
+            </label>
+            <label>
+              Job title
+              <input name="jobTitle" type="text" autocomplete="organization-title" />
+            </label>
+            <label>
+              Time at this job
+              <input name="employmentLength" type="text" placeholder="e.g. 18 months" />
+            </label>
+            <label>
+              Work phone
+              <input name="workPhone" type="tel" />
+            </label>
+            <label>
+              Gross monthly income
+              <input name="monthlyIncome" type="text" inputmode="decimal" required placeholder="$" />
+            </label>
+            <label class="span-2">
+              Other income (optional)
+              <input name="otherIncome" type="text" placeholder="Source and monthly amount" />
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Household</legend>
+          <div class="grid">
+            <label class="span-2">
+              Other occupants
+              <textarea name="occupants" rows="3" placeholder="Full name, age, and relationship for each person who will live in the home."></textarea>
+            </label>
+            <label class="span-2">
+              Pets
+              <textarea name="pets" rows="2" placeholder="None, or type, breed, weight, and age."></textarea>
+            </label>
+            <label class="span-2">
+              Vehicles
+              <textarea name="vehicles" rows="2" placeholder="Year, make, model, color, and plate."></textarea>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Screening</legend>
+          <p class="hint">Answer honestly. A yes does not automatically disqualify you.</p>
+          <div class="grid">
+            <label>
+              Have you ever been evicted?
+              <select name="evicted">
+                <option value="No" selected>No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </label>
+            <label>
+              Bankruptcy in the last 7 years?
+              <select name="bankruptcy">
+                <option value="No" selected>No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </label>
+            <label class="span-2">
+              Felony conviction?
+              <select name="felony">
+                <option value="No" selected>No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </label>
+            <label class="span-2">
+              If you answered yes to any of the above, please explain
+              <textarea name="screeningNotes" rows="3"></textarea>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Emergency contact</legend>
+          <div class="grid">
+            <label>
+              Name
+              <input name="emergencyName" type="text" />
+            </label>
+            <label>
+              Phone
+              <input name="emergencyPhone" type="tel" />
+            </label>
+            <label class="span-2">
+              Relationship
+              <input name="emergencyRelation" type="text" />
+            </label>
+            <label class="span-2">
+              How did you hear about this rental?
+              <input name="howHeard" type="text" />
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Certification</legend>
+          <p class="legal">
+            I certify that the information on this application is true and complete.
+            I understand that a false statement may result in rejection of this
+            application or termination of a later tenancy. I authorize the landlord
+            to verify the information provided, including credit, rental, income,
+            and background history, as allowed by law. Submitting this form is not
+            a lease and does not guarantee housing.
+          </p>
+          <label class="check">
+            <input name="certify" type="checkbox" value="yes" required />
+            I agree to the statement above.
+          </label>
+          <label>
+            Type your full name as a signature
+            <input name="signature" type="text" required autocomplete="off" />
+          </label>
+        </fieldset>
+
+        <label class="hp" aria-hidden="true">
+          Fax
+          <input name="fax" type="text" tabindex="-1" autocomplete="off" />
+        </label>
+
+        <p id="form-error" class="form-error" hidden></p>
+
+        <div class="actions">
+          <button type="submit" id="submit-btn">Submit application</button>
+          <p class="fine">Sent to vibhorfall@gmail.com · vibmehta.com</p>
+        </div>
+      </form>
+
+      <section id="success" class="success" hidden>
+        <p class="eyebrow">Received</p>
+        <h2>Application sent.</h2>
+        <p>
+          Thank you. Your application was emailed to the landlord. If anything
+          else is needed, you will hear back at the email you provided.
+        </p>
+      </section>
+    </main>
+
+    <footer>
+      <p>© <span id="year"></span> Vib Mehta · We do business in accordance with the Fair Housing Act.</p>
+    </footer>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

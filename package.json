@@ -1,0 +1,12 @@
+{
+  "name": "vibmehta.com",
+  "private": true,
+  "description": "Rental application for vibmehta.com — Cloudflare Workers + static assets",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.37.0"
+  }
+}
