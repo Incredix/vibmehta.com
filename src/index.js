@@ -1,3 +1,16 @@
+import { login, logout, requireAdmin, sessionOk } from "./auth.js";
+import { creditProvider, runCredit } from "./credit.js";
+import {
+  getApplication,
+  getApplicationForCredit,
+  hasDb,
+  listApplications,
+  saveApplication,
+  saveCreditCheck,
+  updateNotes,
+  updateStatus,
+} from "./db.js";
+
 const TO_EMAIL = "vibhorfall@gmail.com";
 const FROM_EMAIL = "applications@vibmehta.com";
 const SITE_NAME = "Vib Mehta Rentals";
@@ -6,12 +19,14 @@ const REQUIRED = [
   "fullName",
   "email",
   "phone",
+  "dateOfBirth",
   "currentAddress",
   "moveInDate",
   "employer",
   "monthlyIncome",
   "signature",
   "certify",
+  "creditAuth",
 ];
 
 const LABELS = {
@@ -27,6 +42,9 @@ const LABELS = {
   email: "Email",
   phone: "Phone",
   currentAddress: "Current address",
+  city: "City",
+  state: "State",
+  zip: "ZIP",
   currentRent: "Current monthly rent",
   timeAtAddress: "Time at current address",
   landlordName: "Current landlord / manager",
@@ -56,32 +74,122 @@ const LABELS = {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const { pathname } = url;
 
-    if (url.pathname === "/api/apply") {
-      if (request.method === "OPTIONS") {
-        return cors(new Response(null, { status: 204 }));
-      }
-      if (request.method !== "POST") {
-        return cors(json({ ok: false, error: "Method not allowed" }, 405));
-      }
+    if (pathname === "/api/apply") {
+      if (request.method === "OPTIONS") return cors(new Response(null, { status: 204 }));
+      if (request.method !== "POST") return cors(json({ ok: false, error: "Method not allowed" }, 405));
       return cors(await handleApply(request, env));
+    }
+
+    if (pathname.startsWith("/api/admin/")) {
+      return handleAdmin(request, env, pathname);
     }
 
     return env.ASSETS.fetch(request);
   },
 };
 
+async function handleAdmin(request, env, pathname) {
+  if (pathname === "/api/admin/login" && request.method === "POST") {
+    return login(request, env);
+  }
+  if (pathname === "/api/admin/logout" && request.method === "POST") {
+    return logout(request);
+  }
+  if (pathname === "/api/admin/session" && request.method === "GET") {
+    return sessionOk(request, env);
+  }
+
+  const denied = await requireAdmin(request, env);
+  if (denied) return denied;
+
+  if (!hasDb(env)) {
+    return json(
+      {
+        ok: false,
+        error:
+          "Create a D1 database named vibmehta-applications, bind it as DB, and run migrations.",
+      },
+      503,
+    );
+  }
+
+  if (pathname === "/api/admin/applications" && request.method === "GET") {
+    const applications = await listApplications(env);
+    return json({
+      ok: true,
+      applications,
+      creditProvider: creditProvider(env),
+    });
+  }
+
+  const match = pathname.match(/^\/api\/admin\/applications\/([^/]+)(?:\/(credit|status|notes))?$/);
+  if (!match) return json({ ok: false, error: "Not found." }, 404);
+
+  const id = match[1];
+  const action = match[2];
+
+  if (!action && request.method === "GET") {
+    const application = await getApplication(env, id);
+    if (!application) return json({ ok: false, error: "Application not found." }, 404);
+    return json({ ok: true, application, creditProvider: creditProvider(env) });
+  }
+
+  if (action === "status" && request.method === "POST") {
+    const body = await readJson(request);
+    try {
+      const ok = await updateStatus(env, id, String(body.status || ""));
+      if (!ok) return json({ ok: false, error: "Application not found." }, 404);
+      return json({ ok: true });
+    } catch (err) {
+      return json({ ok: false, error: err.message }, 400);
+    }
+  }
+
+  if (action === "notes" && request.method === "POST") {
+    const body = await readJson(request);
+    const ok = await updateNotes(env, id, body.notes);
+    if (!ok) return json({ ok: false, error: "Application not found." }, 404);
+    return json({ ok: true });
+  }
+
+  if (action === "credit" && request.method === "POST") {
+    const row = await getApplicationForCredit(env, id);
+    if (!row) return json({ ok: false, error: "Application not found." }, 404);
+    try {
+      const result = await runCredit(env, row);
+      await saveCreditCheck(env, id, result);
+      await updateStatus(env, id, "reviewing");
+      return json({
+        ok: true,
+        credit: {
+          provider: result.provider,
+          status: result.status,
+          score: result.score,
+          rating: result.rating,
+          recommendation: result.recommendation,
+          summary: result.summary,
+        },
+      });
+    } catch (err) {
+      await saveCreditCheck(env, id, {
+        provider: creditProvider(env),
+        status: "failed",
+        summary: err.message,
+        raw: { error: err.message },
+      });
+      return json({ ok: false, error: err.message }, 502);
+    }
+  }
+
+  return json({ ok: false, error: "Method not allowed." }, 405);
+}
+
 async function handleApply(request, env) {
   let data;
-
   try {
-    const contentType = request.headers.get("content-type") || "";
-    if (contentType.includes("application/json")) {
-      data = await request.json();
-    } else {
-      const form = await request.formData();
-      data = Object.fromEntries(form.entries());
-    }
+    data = await readBody(request);
   } catch {
     return json({ ok: false, error: "Could not read the application." }, 400);
   }
@@ -90,61 +198,80 @@ async function handleApply(request, env) {
     return json({ ok: false, error: "Invalid application." }, 400);
   }
 
-  // Honeypot — bots fill hidden fields.
   if (String(data.fax || data.website || "").trim()) {
     return json({ ok: true });
   }
 
   const cleaned = {};
   for (const [key, value] of Object.entries(data)) {
-    if (key === "fax" || key === "website" || key === "certify") continue;
+    if (key === "fax" || key === "website" || key === "certify" || key === "creditAuth") continue;
     cleaned[key] = String(value ?? "").trim();
   }
 
   const missing = REQUIRED.filter((key) => {
-    if (key === "certify") return !isChecked(data.certify);
+    if (key === "certify" || key === "creditAuth") return !isChecked(data[key]);
     return !cleaned[key];
   });
 
   if (missing.length) {
-    return json(
-      { ok: false, error: "Please complete the required fields.", missing },
-      400,
-    );
+    return json({ ok: false, error: "Please complete the required fields.", missing }, 400);
   }
 
   if (!isEmail(cleaned.email)) {
     return json({ ok: false, error: "Please enter a valid email address." }, 400);
   }
 
+  const ssnDigits = String(cleaned.ssnFull || cleaned.ssnLast4 || "").replace(/\D/g, "");
+  if (ssnDigits.length === 9) {
+    cleaned.ssnLast4 = ssnDigits.slice(-4);
+    cleaned.ssnFull = ssnDigits;
+  } else if (ssnDigits.length === 4) {
+    cleaned.ssnLast4 = ssnDigits;
+  }
+
   cleaned.submittedAt = new Date().toISOString();
   cleaned.applicantIp = request.headers.get("cf-connecting-ip") || "";
 
-  const subject = `Rental application — ${cleaned.fullName}`;
-  const text = toPlainText(cleaned);
-  const html = toHtmlEmail(cleaned);
+  let applicationId = null;
+  if (hasDb(env)) {
+    try {
+      applicationId = await saveApplication(env, cleaned);
+    } catch (err) {
+      console.error("Database save failed", err);
+      return json(
+        { ok: false, error: "The application could not be saved. Please try again." },
+        500,
+      );
+    }
+  }
+
+  const emailSafe = { ...cleaned };
+  delete emailSafe.ssnFull;
+  if (applicationId) emailSafe.adminId = applicationId;
 
   try {
     await deliverEmail(env, {
-      subject,
-      text,
-      html,
+      subject: `Rental application — ${cleaned.fullName}`,
+      text: toPlainText(emailSafe),
+      html: toHtmlEmail(emailSafe, applicationId),
       replyTo: cleaned.email,
       applicantName: cleaned.fullName,
     });
   } catch (err) {
     console.error("Email delivery failed", err);
-    return json(
-      {
-        ok: false,
-        error:
-          "The application could not be emailed. Please try again or email vibhorfall@gmail.com directly.",
-      },
-      502,
-    );
+    if (!applicationId) {
+      return json(
+        {
+          ok: false,
+          error:
+            "The application could not be emailed. Please try again or email vibhorfall@gmail.com directly.",
+        },
+        502,
+      );
+    }
   }
 
-  return json({ ok: true });
+  return json({ ok: true, id: applicationId });
 }
 
 async function deliverEmail(env, { subject, text, html, replyTo, applicantName }) {
@@ -167,8 +294,6 @@ async function deliverEmail(env, { subject, text, html, replyTo, applicantName }
     }
   }
 
-  // Backup: FormSubmit delivers to Gmail with no extra Cloudflare product setup.
-  // The first live submission sends a one-time confirmation email to Gmail.
   const backup = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(to)}`, {
     method: "POST",
     headers: {
@@ -194,6 +319,7 @@ async function deliverEmail(env, { subject, text, html, replyTo, applicantName }
 
 function toPlainText(data) {
   const lines = [`New rental application from ${data.fullName}`, ""];
+  if (data.adminId) lines.push(`Inbox: https://vibmehta.com/admin  (id ${data.adminId})`, "");
   for (const [key, label] of Object.entries(LABELS)) {
     const value = data[key];
     if (!value) continue;
@@ -202,7 +328,7 @@ function toPlainText(data) {
   return lines.join("\n");
 }
 
-function toHtmlEmail(data) {
+function toHtmlEmail(data, applicationId) {
   const rows = Object.entries(LABELS)
     .filter(([key]) => data[key])
     .map(
@@ -214,6 +340,10 @@ function toHtmlEmail(data) {
     )
     .join("");
 
+  const inbox = applicationId
+    ? `<p style="padding:0 28px 8px;font-size:14px;"><a href="https://vibmehta.com/admin" style="color:#2c4a3e;">Open landlord inbox</a></p>`
+    : "";
+
   return `<!doctype html>
 <html>
 <body style="margin:0;background:#f6f1e8;font-family:Georgia,serif;">
@@ -222,11 +352,27 @@ function toHtmlEmail(data) {
       <div style="letter-spacing:.16em;text-transform:uppercase;font-size:11px;opacity:.8;">${escapeHtml(SITE_NAME)}</div>
       <h1 style="margin:8px 0 0;font-size:22px;font-weight:normal;">New rental application</h1>
     </div>
+    ${inbox}
     <table style="width:100%;border-collapse:collapse;font-size:15px;">${rows}</table>
-    <p style="padding:18px 28px 28px;color:#7a7368;font-size:13px;">Reply directly to this email to reach the applicant.</p>
+    <p style="padding:18px 28px 28px;color:#7a7368;font-size:13px;">Reply directly to this email to reach the applicant. Full SSN is never emailed.</p>
   </div>
 </body>
 </html>`;
+}
+
+async function readBody(request) {
+  const contentType = request.headers.get("content-type") || "";
+  if (contentType.includes("application/json")) return request.json();
+  const form = await request.formData();
+  return Object.fromEntries(form.entries());
+}
+
+async function readJson(request) {
+  try {
+    return await request.json();
+  } catch {
+    return {};
+  }
 }
 
 function isChecked(value) {

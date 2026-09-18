@@ -1,10 +1,13 @@
 {
   "name": "vibmehta.com",
   "private": true,
+  "type": "module",
   "description": "Rental application for vibmehta.com — Cloudflare Workers + static assets",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "preview": "node scripts/preview.mjs",
+    "deploy": "wrangler deploy",
+    "db:local": "wrangler d1 migrations apply vibmehta-applications --local"
   },
   "devDependencies": {
     "wrangler": "^4.37.0"

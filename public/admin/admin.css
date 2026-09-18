@@ -1,0 +1,205 @@
+.admin-body .admin-header,
+.admin-body .admin-main {
+  width: min(1180px, calc(100% - 32px));
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #efe4d0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.text-btn {
+  background: transparent;
+  color: var(--forest);
+  padding: 8px 10px;
+}
+
+.login-card {
+  max-width: 360px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+}
+
+.inbox {
+  padding-bottom: 48px;
+}
+
+.inbox-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 340px) 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.list-pane,
+.detail-pane {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+  min-height: 70vh;
+}
+
+.list-head,
+.detail-pane {
+  padding: 20px;
+}
+
+.list-head h1 {
+  font-size: 1.6rem;
+}
+
+.app-list {
+  display: flex;
+  flex-direction: column;
+}
+
+button.app-row {
+  appearance: none;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 18px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+button.app-row:hover,
+button.app-row.active {
+  background: #f6f1e8;
+}
+
+button.text-btn {
+  background: transparent;
+  color: var(--forest);
+  padding: 8px 10px;
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--forest);
+  border: 1px solid var(--forest);
+}
+
+.app-row strong {
+  display: block;
+}
+
+.app-row small {
+  color: var(--muted);
+}
+
+.score-chip {
+  align-self: center;
+  min-width: 46px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.score-chip.excellent { background: #dceee4; color: #1d342c; }
+.score-chip.good { background: #e7edd8; color: #3d4a22; }
+.score-chip.fair { background: #f4e6c8; color: #6a4b16; }
+.score-chip.poor { background: #f3d9d2; color: #9b2c1a; }
+.score-chip.unknown { background: #efe4d0; color: var(--muted); }
+
+.status {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+  margin: 16px 0 24px;
+}
+
+.detail-grid div {
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.detail-grid dt {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.detail-grid dd {
+  margin: 2px 0 0;
+}
+
+.credit-card {
+  padding: 16px;
+  margin: 12px 0 20px;
+  border-radius: 12px;
+  background: #f6f1e8;
+}
+
+.credit-card .score {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+
+.notes {
+  width: 100%;
+  min-height: 90px;
+}
+
+.empty {
+  color: var(--muted);
+}
+
+.demo-flag {
+  color: var(--clay);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 860px) {
+  .inbox-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .list-pane,
+  .detail-pane {
+    min-height: 0;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}

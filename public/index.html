@@ -92,11 +92,15 @@
             </label>
             <label>
               Date of birth
-              <input name="dateOfBirth" type="date" autocomplete="bday" />
+              <input name="dateOfBirth" type="date" required autocomplete="bday" />
             </label>
             <label>
-              SSN last 4
-              <input name="ssnLast4" type="text" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="••••" />
+              Social Security number
+              <input name="ssnFull" type="text" inputmode="numeric" autocomplete="off" placeholder="123-45-6789" />
+            </label>
+            <label>
+              SSN last 4 only
+              <input name="ssnLast4" type="text" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="If you prefer not to give the full SSN yet" />
             </label>
             <label class="span-2">
               Driver’s license / state ID
@@ -113,8 +117,20 @@
           <legend>Current residence</legend>
           <div class="grid">
             <label class="span-2">
-              Current address
-              <input name="currentAddress" type="text" required autocomplete="street-address" />
+              Current street address
+              <input name="currentAddress" type="text" required autocomplete="street-address" placeholder="123 Main St, Apt 4" />
+            </label>
+            <label>
+              City
+              <input name="city" type="text" autocomplete="address-level2" />
+            </label>
+            <label>
+              State
+              <input name="state" type="text" maxlength="2" autocomplete="address-level1" placeholder="CA" />
+            </label>
+            <label>
+              ZIP
+              <input name="zip" type="text" inputmode="numeric" autocomplete="postal-code" />
             </label>
             <label>
               Time at this address
@@ -255,6 +271,10 @@
             <input name="certify" type="checkbox" value="yes" required />
             I agree to the statement above.
           </label>
+          <label class="check">
+            <input name="creditAuth" type="checkbox" value="yes" required />
+            I authorize a credit and tenant-screening check for this rental application, and I understand this may be a consumer report under the Fair Credit Reporting Act.
+          </label>
           <label>
             Type your full name as a signature
             <input name="signature" type="text" required autocomplete="off" />
@@ -278,8 +298,8 @@
         <p class="eyebrow">Received</p>
         <h2>Application sent.</h2>
         <p>
-          Thank you. Your application was emailed to the landlord. If anything
-          else is needed, you will hear back at the email you provided.
+          Thank you. Your application was saved and emailed to the landlord. If
+          anything else is needed, you will hear back at the email you provided.
         </p>
       </section>
     </main>

@@ -1,0 +1,10 @@
+ADMIN_PASSWORD=local-admin
+# Live credit (optional). Without these, Run Credit returns a clearly labeled demo score.
+# CREDIT_PROVIDER=microbilt
+# MICROBILT_CLIENT_ID=
+# MICROBILT_CLIENT_SECRET=
+# MICROBILT_SANDBOX=true
+# CREDIT_API_URL=
+# CREDIT_API_KEY=
+# CRS_API_KEY=
+# CRS_CONFIG=
