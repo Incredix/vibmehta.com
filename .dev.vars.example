@@ -1,4 +1,6 @@
 ADMIN_PASSWORD=local-admin
+# Street addresses stay out of git. Set one per listing id.
+LISTING_FREMONT_ADDRESS=
 # Live credit (optional). Without these, Run Credit returns a clearly labeled demo score.
 # CREDIT_PROVIDER=microbilt
 # MICROBILT_CLIENT_ID=

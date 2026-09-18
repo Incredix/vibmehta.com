@@ -1,5 +1,6 @@
 import { login, logout, requireAdmin, sessionOk } from "./auth.js";
 import { creditProvider, runCredit } from "./credit.js";
+import { publicListings, resolveListing } from "./listings.js";
 import {
   getApplication,
   getApplicationForCredit,
@@ -30,7 +31,9 @@ const REQUIRED = [
 ];
 
 const LABELS = {
-  propertyAddress: "Property applying for",
+  listingName: "Listing",
+  listingLocation: "Area",
+  propertyAddress: "Property address",
   desiredRent: "Monthly rent offered",
   leaseTerm: "Requested lease term",
   moveInDate: "Desired move-in date",
@@ -75,6 +78,10 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const { pathname } = url;
+
+    if (pathname === "/api/listings" && request.method === "GET") {
+      return cors(json({ ok: true, listings: publicListings() }));
+    }
 
     if (pathname === "/api/apply") {
       if (request.method === "OPTIONS") return cors(new Response(null, { status: 204 }));
@@ -204,9 +211,26 @@ async function handleApply(request, env) {
 
   const cleaned = {};
   for (const [key, value] of Object.entries(data)) {
-    if (key === "fax" || key === "website" || key === "certify" || key === "creditAuth") continue;
+    if (
+      key === "fax" ||
+      key === "website" ||
+      key === "certify" ||
+      key === "creditAuth" ||
+      key === "propertyAddress"
+    ) {
+      continue;
+    }
     cleaned[key] = String(value ?? "").trim();
   }
+
+  const listing = resolveListing(env, cleaned.listingId);
+  if (!listing) {
+    return json({ ok: false, error: "Choose a listing to apply for." }, 400);
+  }
+  cleaned.listingId = listing.id;
+  cleaned.listingName = listing.publicName;
+  cleaned.listingLocation = listing.publicLocation;
+  cleaned.propertyAddress = listing.address || listing.publicName;
 
   const missing = REQUIRED.filter((key) => {
     if (key === "certify" || key === "creditAuth") return !isChecked(data[key]);
@@ -400,7 +424,7 @@ function json(payload, status = 200) {
 
 function cors(response) {
   response.headers.set("Access-Control-Allow-Origin", "*");
-  response.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   response.headers.set("Access-Control-Allow-Headers", "Content-Type");
   return response;
 }

@@ -34,9 +34,8 @@
         <p class="eyebrow">Rental application</p>
         <h1>Apply for the home.</h1>
         <p class="lede">
-          Fill this out once. It is emailed to the landlord at
-          <a href="mailto:vibhorfall@gmail.com">vibhorfall@gmail.com</a>
-          as soon as you submit. There is no account to create.
+          Fill this out once for the Fremont home. Street address is shared
+          with the landlord only. There is no account to create.
         </p>
       </section>
 
@@ -44,15 +43,12 @@
         <fieldset>
           <legend>The property</legend>
           <div class="grid">
-            <label class="span-2">
-              Property address
-              <input
-                id="propertyAddress"
-                name="propertyAddress"
-                type="text"
-                placeholder="Street, city, state"
-                autocomplete="street-address"
-              />
+            <label class="span-2" id="listing-label">
+              Listing
+              <select id="listingId" name="listingId" required>
+                <option value="">Loading listings…</option>
+              </select>
+              <span id="listing-card" class="listing-card" hidden></span>
             </label>
             <label>
               Desired move-in date

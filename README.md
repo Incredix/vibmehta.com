@@ -13,6 +13,7 @@ Rental application site for [vibmehta.com](https://vibmehta.com). Built for **Cl
 3. Create a **D1** database named `vibmehta-applications`, bind it to the Worker as `DB`, and replace `database_id` in `wrangler.toml`.
 4. In the Worker: **Settings → Variables and Secrets**
    - Secret `ADMIN_PASSWORD` — this is how you sign in at `/admin`
+   - Variable `LISTING_FREMONT_ADDRESS` — real street for the Fremont home (not shown on the public form)
    - Optional live credit secrets below
 5. Deploy, then add custom domains `vibmehta.com` and `www.vibmehta.com`.
 6. Run D1 migrations from the dashboard or:
@@ -20,6 +21,10 @@ Rental application site for [vibmehta.com](https://vibmehta.com). Built for **Cl
 ```bash
 npx wrangler d1 migrations apply vibmehta-applications --remote
 ```
+
+The public form shows **Fremont home · Fremont, CA**. Share `https://vibmehta.com/?listing=fremont`.
+
+To add another home, copy an entry in `src/listings.js` and set `LISTING_<ID>_ADDRESS` in Cloudflare / `.dev.vars`.
 
 ## Credit checks
 

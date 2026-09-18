@@ -40,6 +40,7 @@ export async function listApplications(env) {
     `SELECT
       a.id, a.created_at, a.status, a.property_address, a.full_name,
       a.email, a.phone, a.monthly_income,
+      json_extract(a.payload, '$.listingName') AS listing_name,
       c.score AS credit_score,
       c.rating AS credit_rating,
       c.status AS credit_status,

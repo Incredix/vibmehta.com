@@ -15,7 +15,8 @@ const types = {
 
 const sqlite = new DatabaseSync(":memory:");
 sqlite.exec(readFileSync(join(import.meta.dirname, "../migrations/0001_init.sql"), "utf8"));
-seed(sqlite);
+const devVars = readDevVars();
+seed(sqlite, devVars.LISTING_FREMONT_ADDRESS || "Fremont home");
 
 const env = {
   DB: wrapD1(sqlite),
@@ -23,6 +24,7 @@ const env = {
   TO_EMAIL: "vibhorfall@gmail.com",
   FROM_EMAIL: "applications@vibmehta.com",
   SITE_NAME: "Vib Mehta Rentals",
+  ...devVars,
   EMAIL: {
     async send() {
       return { messageId: "local-preview" };
@@ -72,6 +74,20 @@ server.listen(8787, "127.0.0.1", () => {
   console.log("admin http://127.0.0.1:8787/admin/  password local-admin");
 });
 
+function readDevVars() {
+  const file = join(import.meta.dirname, "../.dev.vars");
+  if (!existsSync(file)) return {};
+  const vars = {};
+  for (const line of readFileSync(file, "utf8").split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eq = trimmed.indexOf("=");
+    if (eq === -1) continue;
+    vars[trimmed.slice(0, eq).trim()] = trimmed.slice(eq + 1).trim();
+  }
+  return vars;
+}
+
 function wrapD1(db) {
   return {
     prepare(sql) {
@@ -97,10 +113,13 @@ function wrapD1(db) {
   };
 }
 
-function seed(db) {
+function seed(db, address) {
   const now = new Date().toISOString();
   const payload = JSON.stringify({
-    propertyAddress: "123 Oak Street",
+    listingId: "fremont",
+    listingName: "Fremont home",
+    listingLocation: "Fremont, CA",
+    propertyAddress: address,
     desiredRent: "$2,450",
     leaseTerm: "12 months",
     moveInDate: "2026-10-01",
@@ -127,7 +146,7 @@ function seed(db) {
     "seed-alex-rivera",
     now,
     now,
-    "123 Oak Street",
+    address || "Fremont home",
     "Alex Rivera",
     "alex.rivera@example.com",
     "(555) 014-8892",

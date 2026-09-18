@@ -9,7 +9,9 @@ const logoutBtn = document.getElementById("logout-btn");
 const providerPill = document.getElementById("provider-pill");
 
 const LABELS = {
-  propertyAddress: "Property",
+  listingName: "Listing",
+  listingLocation: "Area",
+  propertyAddress: "Street address",
   desiredRent: "Rent offered",
   leaseTerm: "Lease term",
   moveInDate: "Move-in",
@@ -131,7 +133,7 @@ async function refreshList() {
       return `<button class="app-row${active}" data-id="${app.id}">
         <span>
           <strong>${escapeHtml(app.full_name)}</strong>
-          <small>${escapeHtml(app.property_address || "No property listed")} · ${formatDate(app.created_at)}</small>
+          <small>${escapeHtml(app.listing_name || app.property_address || "No listing")} · ${formatDate(app.created_at)}</small>
           <span class="status">${escapeHtml(app.status)}</span>
         </span>
         ${score}
