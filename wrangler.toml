@@ -18,13 +18,8 @@ run_worker_first = ["/api/*"]
 # database_id = "PASTE-D1-UUID-HERE"
 # migrations_dir = "migrations"
 
-[[routes]]
-pattern = "vibmehta.com/*"
-zone_name = "vibmehta.com"
-
-[[routes]]
-pattern = "www.vibmehta.com/*"
-zone_name = "vibmehta.com"
+# vibmehta.com routes stay off here — they are still attached to Worker vibmehta-com.
+# After deleting that old Worker, add the custom domains on theory-vibmehta in the dashboard.
 
 [vars]
 TO_EMAIL = "vibhorfall@gmail.com"
