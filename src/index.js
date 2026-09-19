@@ -89,6 +89,12 @@ export default {
       return cors(await handleApply(request, env));
     }
 
+    if (pathname === "/api/availability-alert") {
+      if (request.method === "OPTIONS") return cors(new Response(null, { status: 204 }));
+      if (request.method !== "POST") return cors(json({ ok: false, error: "Method not allowed" }, 405));
+      return cors(await handleAvailabilityAlert(request, env));
+    }
+
     if (pathname.startsWith("/api/admin/")) {
       return handleAdmin(request, env, pathname);
     }
@@ -296,6 +302,64 @@ async function handleApply(request, env) {
   }
 
   return json({ ok: true, id: applicationId });
+}
+
+async function handleAvailabilityAlert(request, env) {
+  const data = await readBody(request);
+  if (String(data.fax || data.website || "").trim()) {
+    return json({ ok: true });
+  }
+
+  const listing = resolveListing(env, data.listingId);
+  if (!listing) {
+    return json({ ok: false, error: "Choose a listing." }, 400);
+  }
+  if (listing.available) {
+    return json({ ok: false, error: "This listing is already open. Apply instead." }, 400);
+  }
+
+  const email = String(data.email || "").trim();
+  const name = String(data.name || "").trim();
+  const phone = String(data.phone || "").trim();
+  if (!isEmail(email)) {
+    return json({ ok: false, error: "Enter a valid email address." }, 400);
+  }
+
+  const submittedAt = new Date().toISOString();
+  const text = [
+    `Availability alert for ${listing.publicName}`,
+    "",
+    `Listing: ${listing.publicName} · ${listing.publicLocation}`,
+    `Email: ${email}`,
+    name ? `Name: ${name}` : "",
+    phone ? `Phone: ${phone}` : "",
+    `Submitted: ${submittedAt}`,
+    "",
+    "They asked to be notified when this listing is available.",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  try {
+    await deliverEmail(env, {
+      subject: `Availability alert — ${listing.publicName} — ${email}`,
+      text,
+      html: `<!doctype html><html><body style="font-family:Georgia,serif;color:#1c1916;">
+        <p>Availability alert for <strong>${escapeHtml(listing.publicName)}</strong>.</p>
+        <p>Email: <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
+        ${name ? `<p>Name: ${escapeHtml(name)}</p>` : ""}
+        ${phone ? `<p>Phone: ${escapeHtml(phone)}</p>` : ""}
+        <p style="color:#7a7368;">They asked to be notified when this listing is available.</p>
+      </body></html>`,
+      replyTo: email,
+      applicantName: name || email,
+    });
+  } catch (err) {
+    console.error("Availability alert email failed", err);
+    return json({ ok: false, error: "Could not save that alert. Try again." }, 502);
+  }
+
+  return json({ ok: true });
 }
 
 async function deliverEmail(env, { subject, text, html, replyTo, applicantName }) {

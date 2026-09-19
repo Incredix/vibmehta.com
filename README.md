@@ -10,7 +10,7 @@ Theory Company rental site, hosted at [vibmehta.com](https://vibmehta.com). Bran
 | Requirements | https://vibmehta.com/requirements |
 | Application | https://vibmehta.com/apply |
 | Fremont home | https://vibmehta.com/apply?listing=fremont |
-| Private room (unavailable) | listed on the homepage, not open to apply |
+| Private room | https://vibmehta.com/apply?listing=fremont-room (unavailable; waitlist) |
 | Landlord inbox | https://vibmehta.com/admin |
 
 ## Load this repo in Cloudflare

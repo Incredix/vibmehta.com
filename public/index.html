@@ -52,11 +52,23 @@
             <p>3 bed · 2 bath · single-family. Apply in a few minutes.</p>
             <span class="listing-cta">Start application</span>
           </a>
-          <article class="home-listing is-unavailable">
-            <span class="eyebrow">Fremont, CA</span>
+          <article class="home-listing">
+            <span class="eyebrow">Fremont, CA · Unavailable</span>
             <h2>Private room</h2>
-            <p>Single room · private entrance.</p>
-            <span class="listing-cta listing-cta-muted">Currently unavailable</span>
+            <p>Single room · private entrance. Live listing — applications open when it’s available.</p>
+            <form class="waitlist-form" data-waitlist>
+              <input type="hidden" name="listingId" value="fremont-room" />
+              <label>
+                Email
+                <input name="email" type="email" required autocomplete="email" placeholder="you@email.com" />
+              </label>
+              <button type="submit">Notify me</button>
+              <label class="hp" aria-hidden="true">
+                Fax
+                <input name="fax" type="text" tabindex="-1" autocomplete="off" />
+              </label>
+              <p class="waitlist-status" data-waitlist-status hidden></p>
+            </form>
           </article>
         </div>
       </section>
@@ -114,5 +126,6 @@
     </footer>
 
     <script src="/home.js"></script>
+    <script src="/waitlist.js"></script>
   </body>
 </html>

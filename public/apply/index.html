@@ -48,6 +48,25 @@
             <a href="/requirements">Full requirements</a>
           </p>
         </aside>
+        <aside id="waitlist-panel" class="req-banner waitlist-banner" hidden>
+          <p>
+            <strong id="waitlist-heading">This listing is unavailable.</strong>
+            Get an email when it opens.
+          </p>
+          <form class="waitlist-form" data-waitlist>
+            <input type="hidden" name="listingId" id="waitlist-listing-id" value="" />
+            <label>
+              Email
+              <input name="email" type="email" required autocomplete="email" placeholder="you@email.com" />
+            </label>
+            <button type="submit">Notify me</button>
+            <label class="hp" aria-hidden="true">
+              Fax
+              <input name="fax" type="text" tabindex="-1" autocomplete="off" />
+            </label>
+            <p class="waitlist-status" data-waitlist-status hidden></p>
+          </form>
+        </aside>
       </section>
 
       <form id="application-form" novalidate>
@@ -316,5 +335,6 @@
     </footer>
 
     <script src="/app.js"></script>
+    <script src="/waitlist.js"></script>
   </body>
 </html>

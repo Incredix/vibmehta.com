@@ -16,11 +16,23 @@ async function loadListings() {
         const location = escapeHtml(listing.publicLocation);
         if (listing.available === false) {
           return `
-      <article class="home-listing is-unavailable">
-        <span class="eyebrow">${location}</span>
+      <article class="home-listing">
+        <span class="eyebrow">${location} · Unavailable</span>
         <h2>${name}</h2>
-        <p>${facts}.</p>
-        <span class="listing-cta listing-cta-muted">Currently unavailable</span>
+        <p>${facts}. Live listing — applications open when it’s available.</p>
+        <form class="waitlist-form" data-waitlist>
+          <input type="hidden" name="listingId" value="${escapeAttr(listing.id)}" />
+          <label>
+            Email
+            <input name="email" type="email" required autocomplete="email" placeholder="you@email.com" />
+          </label>
+          <button type="submit">Notify me</button>
+          <label class="hp" aria-hidden="true">
+            Fax
+            <input name="fax" type="text" tabindex="-1" autocomplete="off" />
+          </label>
+          <p class="waitlist-status" data-waitlist-status hidden></p>
+        </form>
       </article>`;
         }
         return `
@@ -43,4 +55,8 @@ function escapeHtml(value) {
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value);
 }

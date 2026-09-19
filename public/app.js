@@ -65,16 +65,12 @@ async function loadListings() {
     }
 
     if (picked && picked.available === false) {
-      listingSelect.append(new Option("Choose a listing", ""));
-      for (const listing of open) {
-        listingSelect.append(
-          new Option(`${listing.publicName} · ${listing.publicLocation}`, listing.id),
-        );
-      }
-      listingSelect.hidden = false;
-      listingCard.hidden = false;
-      listingCard.textContent = `${picked.publicName} is currently unavailable. Choose another listing.`;
-      return;
+      const panel = document.getElementById("waitlist-panel");
+      const heading = document.getElementById("waitlist-heading");
+      const listingIdInput = document.getElementById("waitlist-listing-id");
+      if (panel) panel.hidden = false;
+      if (heading) heading.textContent = `${picked.publicName} is unavailable.`;
+      if (listingIdInput) listingIdInput.value = picked.id;
     }
 
     if (open.length === 1) {
