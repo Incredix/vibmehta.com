@@ -30,7 +30,7 @@ document.addEventListener("submit", async (event) => {
     });
     if (button) button.textContent = "You’re on the list";
     if (status) {
-      status.textContent = "We’ll email you when this listing is available.";
+      status.textContent = "Check your inbox — we’ll email you when it opens.";
       status.hidden = false;
     }
   } catch (err) {

@@ -29,7 +29,7 @@ npx wrangler d1 migrations apply vibmehta-applications --remote
    - Variable `LISTING_FREMONT_ADDRESS` — real street for the Fremont home
    - Optional live credit secrets below
 
-The public site shows listing names and city, not the street address. Set `available: false` on a listing in `src/listings.js` to show it as unavailable.
+The public site shows listing names and city, not the street address. Set `available: false` on a listing in `src/listings.js` to show it as unavailable. Notify-me signups email the person immediately and again when that listing is marked available.
 
 To add another home, copy an entry in `src/listings.js` and set `LISTING_<ID>_ADDRESS` in Cloudflare / `.dev.vars`. The private room uses `LISTING_FREMONT_ADDRESS` unless `LISTING_FREMONT_ROOM_ADDRESS` is set.
 

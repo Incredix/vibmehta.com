@@ -6,8 +6,11 @@ import {
   getApplicationForCredit,
   hasDb,
   listApplications,
+  markWaitlistNotified,
+  pendingWaitlist,
   saveApplication,
   saveCreditCheck,
+  saveWaitlist,
   updateNotes,
   updateStatus,
 } from "./db.js";
@@ -80,6 +83,13 @@ export default {
     const { pathname } = url;
 
     if (pathname === "/api/listings" && request.method === "GET") {
+      if (hasDb(env)) {
+        try {
+          await notifyWaitlistForOpenListings(env);
+        } catch (err) {
+          console.error("Waitlist notify failed", err);
+        }
+      }
       return cors(json({ ok: true, listings: publicListings() }));
     }
 
@@ -326,7 +336,24 @@ async function handleAvailabilityAlert(request, env) {
   }
 
   const submittedAt = new Date().toISOString();
-  const text = [
+  const site = siteUrl(env);
+  const applyUrl = `${site}/apply?listing=${encodeURIComponent(listing.id)}`;
+
+  if (hasDb(env)) {
+    try {
+      await saveWaitlist(env, {
+        listingId: listing.id,
+        listingName: listing.publicName,
+        email,
+        name,
+        phone,
+      });
+    } catch (err) {
+      console.error("Waitlist save failed", err);
+    }
+  }
+
+  const landlordText = [
     `Availability alert for ${listing.publicName}`,
     "",
     `Listing: ${listing.publicName} · ${listing.publicLocation}`,
@@ -340,10 +367,20 @@ async function handleAvailabilityAlert(request, env) {
     .filter(Boolean)
     .join("\n");
 
+  const subscriberText = [
+    `You’re on the list for ${listing.publicName} in ${listing.publicLocation}.`,
+    "",
+    "We’ll email you at this address when it’s available.",
+    `When it opens, apply here: ${applyUrl}`,
+    "",
+    "Theory",
+    site,
+  ].join("\n");
+
   try {
     await deliverEmail(env, {
       subject: `Availability alert — ${listing.publicName} — ${email}`,
-      text,
+      text: landlordText,
       html: `<!doctype html><html><body style="font-family:Georgia,serif;color:#1c1916;">
         <p>Availability alert for <strong>${escapeHtml(listing.publicName)}</strong>.</p>
         <p>Email: <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
@@ -353,23 +390,85 @@ async function handleAvailabilityAlert(request, env) {
       </body></html>`,
       replyTo: email,
       applicantName: name || email,
+      autoresponse: subscriberText,
     });
   } catch (err) {
     console.error("Availability alert email failed", err);
     return json({ ok: false, error: "Could not save that alert. Try again." }, 502);
   }
 
+  try {
+    await deliverEmail(env, {
+      to: email,
+      subject: `You’re on the list for ${listing.publicName}`,
+      text: subscriberText,
+      html: `<!doctype html><html><body style="font-family:Georgia,serif;color:#1c1916;">
+        <p>You’re on the list for <strong>${escapeHtml(listing.publicName)}</strong> in ${escapeHtml(listing.publicLocation)}.</p>
+        <p>We’ll email you at this address when it’s available.</p>
+        <p><a href="${escapeHtml(applyUrl)}">Apply when it opens</a></p>
+        <p style="color:#7a7368;">Theory</p>
+      </body></html>`,
+      replyTo: env.TO_EMAIL || TO_EMAIL,
+      applicantName: name || email,
+    });
+  } catch (err) {
+    console.warn("Waitlist confirmation to subscriber failed", err);
+  }
+
   return json({ ok: true });
 }
 
-async function deliverEmail(env, { subject, text, html, replyTo, applicantName }) {
-  const to = env.TO_EMAIL || TO_EMAIL;
+async function notifyWaitlistForOpenListings(env) {
+  const site = siteUrl(env);
+  for (const listing of publicListings()) {
+    if (listing.available === false) continue;
+    const pending = await pendingWaitlist(env, listing.id);
+    for (const row of pending) {
+      const applyUrl = `${site}/apply?listing=${encodeURIComponent(listing.id)}`;
+      const text = [
+        `${listing.publicName} in ${listing.publicLocation} is available.`,
+        "",
+        `Apply here: ${applyUrl}`,
+        "",
+        "Theory",
+      ].join("\n");
+      try {
+        await deliverEmail(env, {
+          to: row.email,
+          subject: `${listing.publicName} is available`,
+          text,
+          html: `<!doctype html><html><body style="font-family:Georgia,serif;color:#1c1916;">
+            <p><strong>${escapeHtml(listing.publicName)}</strong> in ${escapeHtml(listing.publicLocation)} is available.</p>
+            <p><a href="${escapeHtml(applyUrl)}">Apply now</a></p>
+            <p style="color:#7a7368;">Theory</p>
+          </body></html>`,
+          replyTo: env.TO_EMAIL || TO_EMAIL,
+          applicantName: row.name || row.email,
+        });
+        await markWaitlistNotified(env, row.id);
+      } catch (err) {
+        console.error("Waitlist release email failed", err);
+      }
+    }
+  }
+}
+
+function siteUrl(env) {
+  return String(env.SITE_URL || "https://www.vibmehta.com").replace(/\/$/, "");
+}
+
+async function deliverEmail(env, { to, subject, text, html, replyTo, applicantName, autoresponse }) {
+  const recipient = to || env.TO_EMAIL || TO_EMAIL;
   const from = env.FROM_EMAIL || FROM_EMAIL;
+
+  if (await sendViaSes(env, { to: recipient, from, subject, text, html })) {
+    return;
+  }
 
   if (env.EMAIL && typeof env.EMAIL.send === "function") {
     try {
       await env.EMAIL.send({
-        to,
+        to: recipient,
         from: { name: env.SITE_NAME || SITE_NAME, email: from },
         replyTo,
         subject,
@@ -382,27 +481,155 @@ async function deliverEmail(env, { subject, text, html, replyTo, applicantName }
     }
   }
 
-  const backup = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(to)}`, {
+  const payload = {
+    _subject: subject,
+    _template: "table",
+    _captcha: "false",
+    _replyto: replyTo,
+    name: applicantName,
+    email: replyTo,
+    message: text,
+  };
+  if (autoresponse) payload._autoresponse = autoresponse;
+
+  const backup = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(recipient)}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
     },
-    body: JSON.stringify({
-      _subject: subject,
-      _template: "table",
-      _captcha: "false",
-      _replyto: replyTo,
-      name: applicantName,
-      email: replyTo,
-      message: text,
-    }),
+    body: JSON.stringify(payload),
   });
 
   if (!backup.ok) {
     const body = await backup.text();
     throw new Error(`Backup email failed (${backup.status}): ${body}`);
   }
+}
+
+async function sendViaSes(env, { to, from, subject, text, html }) {
+  const accessKeyId = env.AWS_ACCESS_KEY_ID;
+  const secretAccessKey = env.AWS_SECRET_ACCESS_KEY;
+  const region = env.AMAZON_SES_REGION || "us-east-1";
+  if (!accessKeyId || !secretAccessKey) return false;
+
+  const source = env.SES_FROM || env.DOCKER_ALERT_FROM || from;
+  const params = new URLSearchParams({
+    Action: "SendEmail",
+    Version: "2010-12-01",
+    Source: source,
+    "Destination.ToAddresses.member.1": to,
+    "Message.Subject.Data": subject,
+    "Message.Subject.Charset": "UTF-8",
+    "Message.Body.Text.Data": text,
+    "Message.Body.Text.Charset": "UTF-8",
+  });
+  if (html) {
+    params.set("Message.Body.Html.Data", html);
+    params.set("Message.Body.Html.Charset", "UTF-8");
+  }
+  const body = params.toString();
+  const host = `email.${region}.amazonaws.com`;
+  const headers = await signAwsRequest({
+    method: "POST",
+    host,
+    path: "/",
+    region,
+    service: "email",
+    accessKeyId,
+    secretAccessKey,
+    body,
+    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+  });
+
+  const response = await fetch(`https://${host}/`, {
+    method: "POST",
+    headers,
+    body,
+  });
+  if (!response.ok) {
+    console.warn("SES send failed", response.status, await response.text());
+    return false;
+  }
+  return true;
+}
+
+async function signAwsRequest({
+  method,
+  host,
+  path,
+  region,
+  service,
+  accessKeyId,
+  secretAccessKey,
+  body,
+  contentType,
+}) {
+  const encoder = new TextEncoder();
+  const now = new Date();
+  const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, "");
+  const dateStamp = amzDate.slice(0, 8);
+  const payloadHash = await sha256Hex(body);
+  const canonicalHeaders = `content-type:${contentType}\nhost:${host}\nx-amz-date:${amzDate}\n`;
+  const signedHeaders = "content-type;host;x-amz-date";
+  const canonicalRequest = [
+    method,
+    path,
+    "",
+    canonicalHeaders,
+    signedHeaders,
+    payloadHash,
+  ].join("\n");
+  const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
+  const stringToSign = [
+    "AWS4-HMAC-SHA256",
+    amzDate,
+    credentialScope,
+    await sha256Hex(canonicalRequest),
+  ].join("\n");
+  const signingKey = await awsSigningKey(secretAccessKey, dateStamp, region, service);
+  const signature = await hmacHex(signingKey, stringToSign);
+  return {
+    "Content-Type": contentType,
+    Host: host,
+    "X-Amz-Date": amzDate,
+    Authorization: `AWS4-HMAC-SHA256 Credential=${accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`,
+  };
+}
+
+async function awsSigningKey(secret, dateStamp, region, service) {
+  const kDate = await hmacRaw(encoderEncode(`AWS4${secret}`), dateStamp);
+  const kRegion = await hmacRaw(kDate, region);
+  const kService = await hmacRaw(kRegion, service);
+  return hmacRaw(kService, "aws4_request");
+}
+
+function encoderEncode(value) {
+  return new TextEncoder().encode(value);
+}
+
+async function sha256Hex(value) {
+  const digest = await crypto.subtle.digest("SHA-256", encoderEncode(value));
+  return bufferToHex(digest);
+}
+
+async function hmacRaw(key, data) {
+  const cryptoKey = await crypto.subtle.importKey(
+    "raw",
+    key instanceof Uint8Array ? key : new Uint8Array(key),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  return new Uint8Array(await crypto.subtle.sign("HMAC", cryptoKey, encoderEncode(data)));
+}
+
+async function hmacHex(key, data) {
+  return bufferToHex(await hmacRaw(key, data));
+}
+
+function bufferToHex(buffer) {
+  return [...new Uint8Array(buffer)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 function toPlainText(data) {

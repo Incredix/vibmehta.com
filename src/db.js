@@ -149,3 +149,52 @@ function last4(value) {
   const only = String(value || "").replace(/\D/g, "");
   return only.slice(-4);
 }
+
+export async function saveWaitlist(env, { listingId, listingName, email, name, phone }) {
+  const now = new Date().toISOString();
+  const existing = await env.DB.prepare(
+    `SELECT id FROM availability_alerts WHERE listing_id = ? AND email = ?`,
+  )
+    .bind(listingId, email)
+    .first();
+
+  if (existing?.id) {
+    await env.DB.prepare(
+      `UPDATE availability_alerts
+       SET name = ?, phone = ?, listing_name = ?, notified_at = NULL
+       WHERE id = ?`,
+    )
+      .bind(name || "", phone || "", listingName || "", existing.id)
+      .run();
+    return existing.id;
+  }
+
+  const id = crypto.randomUUID();
+  await env.DB.prepare(
+    `INSERT INTO availability_alerts (
+      id, created_at, listing_id, listing_name, email, name, phone, notified_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL)`,
+  )
+    .bind(id, now, listingId, listingName || "", email, name || "", phone || "")
+    .run();
+  return id;
+}
+
+export async function pendingWaitlist(env, listingId) {
+  const { results } = await env.DB.prepare(
+    `SELECT id, email, name, listing_id, listing_name
+     FROM availability_alerts
+     WHERE listing_id = ? AND notified_at IS NULL`,
+  )
+    .bind(listingId)
+    .all();
+  return results || [];
+}
+
+export async function markWaitlistNotified(env, id) {
+  await env.DB.prepare(
+    `UPDATE availability_alerts SET notified_at = ? WHERE id = ?`,
+  )
+    .bind(new Date().toISOString(), id)
+    .run();
+}

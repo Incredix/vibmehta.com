@@ -15,6 +15,7 @@ const types = {
 
 const sqlite = new DatabaseSync(":memory:");
 sqlite.exec(readFileSync(join(import.meta.dirname, "../migrations/0001_init.sql"), "utf8"));
+sqlite.exec(readFileSync(join(import.meta.dirname, "../migrations/0002_waitlist.sql"), "utf8"));
 const devVars = readDevVars();
 seed(sqlite, devVars.LISTING_FREMONT_ADDRESS || "Fremont home");
 
