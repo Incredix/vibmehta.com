@@ -12,3 +12,7 @@ LISTING_FREMONT_ADDRESS=
 # CREDIT_API_KEY=
 # CRS_API_KEY=
 # CRS_CONFIG=
+
+# Email via TCP SES (no AWS keys on Cloudflare). Set secret in CF Worker secrets.
+# TCP_EMAIL_INGEST_URL=https://tradechefpro.com/api/external/vibmehta-email/
+# TCP_EMAIL_INGEST_SECRET=

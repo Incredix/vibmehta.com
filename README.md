@@ -27,6 +27,7 @@ npx wrangler d1 migrations apply vibmehta-applications --remote
 5. Worker secrets/vars:
    - Secret `ADMIN_PASSWORD` — sign in at `/admin`
    - Variable `LISTING_FREMONT_ADDRESS` — real street for the Fremont home
+   - Secrets `TCP_EMAIL_INGEST_URL` + `TCP_EMAIL_INGEST_SECRET` — send mail through TCP SES (no AWS keys on Cloudflare)
    - Optional live credit secrets below
 
 The public site shows listing names and city, not the street address. Set `available: false` on a listing in `src/listings.js` to show it as unavailable. Notify-me signups email the person immediately and again when that listing is marked available.

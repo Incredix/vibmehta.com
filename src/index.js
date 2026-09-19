@@ -461,6 +461,11 @@ async function deliverEmail(env, { to, subject, text, html, replyTo, applicantNa
   const recipient = to || env.TO_EMAIL || TO_EMAIL;
   const from = env.FROM_EMAIL || FROM_EMAIL;
 
+  // Prefer TCP SES relay — AWS keys stay on tradechefpro, never in this Worker.
+  if (await sendViaTcp(env, { to: recipient, from, subject, text, html, replyTo })) {
+    return;
+  }
+
   if (await sendViaSes(env, { to: recipient, from, subject, text, html })) {
     return;
   }
@@ -505,6 +510,28 @@ async function deliverEmail(env, { to, subject, text, html, replyTo, applicantNa
     const body = await backup.text();
     throw new Error(`Backup email failed (${backup.status}): ${body}`);
   }
+}
+
+async function sendViaTcp(env, { to, from, subject, text, html, replyTo }) {
+  const url = String(env.TCP_EMAIL_INGEST_URL || "").trim();
+  const secret = String(env.TCP_EMAIL_INGEST_SECRET || "").trim();
+  if (!url || !secret) return false;
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-TCP-Vibmehta-Email-Secret": secret,
+    },
+    body: JSON.stringify({ to, from, subject, text, html, replyTo }),
+  });
+  if (!response.ok) {
+    console.warn("TCP email relay failed", response.status);
+    return false;
+  }
+  const payload = await response.json().catch(() => ({}));
+  return Boolean(payload.ok);
 }
 
 async function sendViaSes(env, { to, from, subject, text, html }) {
