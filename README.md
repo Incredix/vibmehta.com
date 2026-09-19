@@ -9,7 +9,8 @@ Theory Company rental site, hosted at [vibmehta.com](https://vibmehta.com). Bran
 | Homepage | https://vibmehta.com/ |
 | Requirements | https://vibmehta.com/requirements |
 | Application | https://vibmehta.com/apply |
-| Fremont listing | https://vibmehta.com/apply?listing=fremont |
+| Fremont home | https://vibmehta.com/apply?listing=fremont |
+| Private room (unavailable) | listed on the homepage, not open to apply |
 | Landlord inbox | https://vibmehta.com/admin |
 
 ## Load this repo in Cloudflare
@@ -28,9 +29,9 @@ npx wrangler d1 migrations apply vibmehta-applications --remote
    - Variable `LISTING_FREMONT_ADDRESS` — real street for the Fremont home
    - Optional live credit secrets below
 
-The public site shows **Fremont home · Fremont, CA**, not the street address.
+The public site shows listing names and city, not the street address. Set `available: false` on a listing in `src/listings.js` to show it as unavailable.
 
-To add another home, copy an entry in `src/listings.js` and set `LISTING_<ID>_ADDRESS` in Cloudflare / `.dev.vars`.
+To add another home, copy an entry in `src/listings.js` and set `LISTING_<ID>_ADDRESS` in Cloudflare / `.dev.vars`. The private room uses `LISTING_FREMONT_ADDRESS` unless `LISTING_FREMONT_ROOM_ADDRESS` is set.
 
 ## Credit checks
 

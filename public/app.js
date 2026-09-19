@@ -56,13 +56,29 @@ async function loadListings() {
     const listings = payload.listings || [];
     listingSelect.innerHTML = "";
 
-    if (!listings.length) {
+    const open = listings.filter((item) => item.available !== false);
+    const picked = listings.find((item) => item.id === requested);
+
+    if (!open.length) {
       listingSelect.innerHTML = `<option value="">No listings available</option>`;
       return;
     }
 
-    if (listings.length === 1) {
-      const listing = listings[0];
+    if (picked && picked.available === false) {
+      listingSelect.append(new Option("Choose a listing", ""));
+      for (const listing of open) {
+        listingSelect.append(
+          new Option(`${listing.publicName} · ${listing.publicLocation}`, listing.id),
+        );
+      }
+      listingSelect.hidden = false;
+      listingCard.hidden = false;
+      listingCard.textContent = `${picked.publicName} is currently unavailable. Choose another listing.`;
+      return;
+    }
+
+    if (open.length === 1) {
+      const listing = open[0];
       listingSelect.innerHTML = `<option value="${escapeAttr(listing.id)}" selected>${escapeHtml(listing.publicName)}</option>`;
       listingSelect.hidden = true;
       listingCard.hidden = false;
@@ -70,14 +86,14 @@ async function loadListings() {
       return;
     }
 
-    listingSelect.append(new Option("Choose a home", ""));
-    for (const listing of listings) {
+    listingSelect.append(new Option("Choose a listing", ""));
+    for (const listing of open) {
       listingSelect.append(
         new Option(`${listing.publicName} · ${listing.publicLocation}`, listing.id),
       );
     }
 
-    if (requested && listings.some((item) => item.id === requested)) {
+    if (requested && open.some((item) => item.id === requested)) {
       listingSelect.value = requested;
     }
   } catch {

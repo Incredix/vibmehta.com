@@ -12,27 +12,40 @@ export const LISTINGS = [
     publicLocation: "Fremont, CA",
     facts: "3 bed · 2 bath · single-family",
   },
+  {
+    id: "fremont-room",
+    publicName: "Private room",
+    publicLocation: "Fremont, CA",
+    facts: "Single room · private entrance",
+    available: false,
+    addressFrom: "fremont",
+  },
 ];
 
 export function publicListings() {
-  return LISTINGS.map(({ id, publicName, publicLocation, facts }) => ({
-    id,
-    publicName,
-    publicLocation,
-    facts,
-  }));
+  return LISTINGS.map(
+    ({ id, publicName, publicLocation, facts, available = true }) => ({
+      id,
+      publicName,
+      publicLocation,
+      facts,
+      available,
+    }),
+  );
 }
 
-export function resolveListing(env, listingId) {
+export function resolveListing(env, listingId, { requireAvailable = false } = {}) {
   const requested = String(listingId || "").trim().toLowerCase();
   const listing =
     LISTINGS.find((item) => item.id === requested) ||
     (LISTINGS.length === 1 ? LISTINGS[0] : null);
   if (!listing) return null;
+  if (requireAvailable && listing.available === false) return null;
 
   return {
     ...listing,
-    address: listingAddress(env, listing.id),
+    available: listing.available !== false,
+    address: listingAddress(env, listing.addressFrom || listing.id),
   };
 }
 

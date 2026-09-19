@@ -223,9 +223,9 @@ async function handleApply(request, env) {
     cleaned[key] = String(value ?? "").trim();
   }
 
-  const listing = resolveListing(env, cleaned.listingId);
+  const listing = resolveListing(env, cleaned.listingId, { requireAvailable: true });
   if (!listing) {
-    return json({ ok: false, error: "Choose a listing to apply for." }, 400);
+    return json({ ok: false, error: "Choose a listing that is currently available." }, 400);
   }
   cleaned.listingId = listing.id;
   cleaned.listingName = listing.publicName;

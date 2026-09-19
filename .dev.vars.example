@@ -1,6 +1,8 @@
 ADMIN_PASSWORD=local-admin
 # Street addresses stay out of git. Set one per listing id.
 LISTING_FREMONT_ADDRESS=
+# Optional. The private room uses the Fremont address unless this is set.
+# LISTING_FREMONT_ROOM_ADDRESS=
 # Live credit (optional). Without these, Run Credit returns a clearly labeled demo score.
 # CREDIT_PROVIDER=microbilt
 # MICROBILT_CLIENT_ID=
