@@ -444,7 +444,7 @@ async function handleAvailabilityAlert(request, env) {
     }
   }
 
-  const landlordText = [
+  const alertText = [
     `Availability alert for ${listing.publicName}`,
     "",
     `Listing: ${listing.publicName} · ${listing.publicLocation}`,
@@ -471,7 +471,7 @@ async function handleAvailabilityAlert(request, env) {
   try {
     await deliverEmail(env, {
       subject: `Availability alert — ${listing.publicName} — ${email}`,
-      text: landlordText,
+      text: alertText,
       html: `<!doctype html><html><body style="font-family:Georgia,serif;color:#1c1916;">
         <p>Availability alert for <strong>${escapeHtml(listing.publicName)}</strong>.</p>
         <p>Email: <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
@@ -774,7 +774,7 @@ function toHtmlEmail(data, applicationId) {
     .join("");
 
   const inbox = applicationId
-    ? `<p style="padding:0 28px 8px;font-size:14px;"><a href="https://vibmehta.com/admin" style="color:#2c4a3e;">Open landlord inbox</a></p>`
+    ? `<p style="padding:0 28px 8px;font-size:14px;"><a href="https://vibmehta.com/admin" style="color:#2c4a3e;">Open manager inbox</a></p>`
     : "";
 
   return `<!doctype html>

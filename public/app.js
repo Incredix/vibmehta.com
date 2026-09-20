@@ -106,7 +106,7 @@ if (tourSkip) {
     tourBlock.hidden = true;
     tourDone.hidden = false;
     tourDone.textContent =
-      "No tour requested. The landlord will follow up by email if needed.";
+      "No tour requested. The manager will follow up by email if needed.";
   });
 }
 
