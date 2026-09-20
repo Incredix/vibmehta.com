@@ -209,6 +209,26 @@ h1 {
   color: var(--clay);
 }
 
+.listing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 18px;
+  margin: 0 0 14px;
+}
+
+.listing-actions .listing-cta {
+  text-decoration: none;
+}
+
+.listing-cta-muted {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.tour-page-form {
+  padding-bottom: 48px;
+}
+
 .waitlist-form {
   display: flex;
   flex-wrap: wrap;

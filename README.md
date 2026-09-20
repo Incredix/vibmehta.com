@@ -8,12 +8,13 @@ Theory Company rental site, hosted at [vibmehta.com](https://vibmehta.com). Bran
 | --- | --- |
 | Homepage | https://vibmehta.com/ |
 | Requirements | https://vibmehta.com/requirements |
+| Tour | https://vibmehta.com/tour |
 | Application | https://vibmehta.com/apply |
 | Fremont home | https://vibmehta.com/apply?listing=fremont |
 | Private room | https://vibmehta.com/apply?listing=fremont-room (unavailable; waitlist) |
 | Landlord inbox | https://vibmehta.com/admin |
 
-After a successful application, applicants can request a tour (date + time). That emails you so you can confirm.
+Tours work for every listing (including unavailable ones). After a successful application, applicants can also request a tour. That emails you so you can confirm.
 
 ## Load this repo in Cloudflare
 

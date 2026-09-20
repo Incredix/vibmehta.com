@@ -14,12 +14,16 @@ async function loadListings() {
         const facts = escapeHtml(listing.facts || "Residential rental");
         const name = escapeHtml(listing.publicName);
         const location = escapeHtml(listing.publicLocation);
+        const id = encodeURIComponent(listing.id);
+        const tourLink = `<a class="listing-cta listing-cta-muted" href="/tour?listing=${id}">Request a tour</a>`;
+
         if (listing.available === false) {
           return `
       <article class="home-listing">
         <span class="eyebrow">${location} · Unavailable</span>
         <h2>${name}</h2>
         <p>${facts}. Live listing — applications open when it’s available.</p>
+        <p class="listing-actions">${tourLink}</p>
         <form class="waitlist-form" data-waitlist>
           <input type="hidden" name="listingId" value="${escapeAttr(listing.id)}" />
           <label>
@@ -35,17 +39,21 @@ async function loadListings() {
         </form>
       </article>`;
         }
+
         return `
-      <a class="home-listing" href="/apply?listing=${encodeURIComponent(listing.id)}">
+      <article class="home-listing">
         <span class="eyebrow">${location}</span>
         <h2>${name}</h2>
         <p>${facts}. Apply in a few minutes.</p>
-        <span class="listing-cta">Start application</span>
-      </a>`;
+        <p class="listing-actions">
+          <a class="listing-cta" href="/apply?listing=${id}">Start application</a>
+          ${tourLink}
+        </p>
+      </article>`;
       })
       .join("");
   } catch {
-    /* Keep the static Fremont card. */
+    /* Keep the static listing cards. */
   }
 }
 

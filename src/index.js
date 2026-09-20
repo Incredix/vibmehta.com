@@ -354,10 +354,10 @@ async function handleTour(request, env) {
   }
 
   const listing = resolveListing(env, listingId);
-  const listingLabel =
-    listingName ||
-    (listing ? `${listing.publicName} · ${listing.publicLocation}` : listingId) ||
-    "Fremont listing";
+  if (!listing) {
+    return json({ ok: false, error: "Choose a listing for the tour." }, 400);
+  }
+  const listingLabel = `${listing.publicName} · ${listing.publicLocation}`;
 
   const submittedAt = new Date().toISOString();
   const text = [

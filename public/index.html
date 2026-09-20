@@ -28,6 +28,7 @@
       </a>
       <nav class="nav">
         <a href="/requirements">Requirements</a>
+        <a href="/tour">Tour</a>
         <a href="/apply">Apply</a>
       </nav>
     </header>
@@ -39,23 +40,29 @@
         <p class="lede lede-serif">Handled directly.</p>
         <p class="actions">
           <a class="btn" href="/apply?listing=fremont">Apply for the home</a>
-          <a class="btn btn-secondary" href="/requirements">See requirements</a>
+          <a class="btn btn-secondary" href="/tour?listing=fremont">Request a tour</a>
         </p>
       </section>
 
       <section>
         <p class="eyebrow">Listings</p>
         <div id="listing-grid" class="listing-grid">
-          <a class="home-listing" href="/apply?listing=fremont">
+          <article class="home-listing">
             <span class="eyebrow">Fremont, CA</span>
             <h2>Fremont home</h2>
             <p>3 bed · 2 bath · single-family. Apply in a few minutes.</p>
-            <span class="listing-cta">Start application</span>
-          </a>
+            <p class="listing-actions">
+              <a class="listing-cta" href="/apply?listing=fremont">Start application</a>
+              <a class="listing-cta listing-cta-muted" href="/tour?listing=fremont">Request a tour</a>
+            </p>
+          </article>
           <article class="home-listing">
             <span class="eyebrow">Fremont, CA · Unavailable</span>
             <h2>Private room</h2>
             <p>Single room · private entrance. Live listing — applications open when it’s available.</p>
+            <p class="listing-actions">
+              <a class="listing-cta listing-cta-muted" href="/tour?listing=fremont-room">Request a tour</a>
+            </p>
             <form class="waitlist-form" data-waitlist>
               <input type="hidden" name="listingId" value="fremont-room" />
               <label>
