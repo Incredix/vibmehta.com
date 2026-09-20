@@ -10,13 +10,11 @@ html_handling = "auto-trailing-slash"
 not_found_handling = "404-page"
 run_worker_first = ["/api/*"]
 
-# D1 is optional until a real database_id is pasted below.
-# Create "vibmehta-applications" in Cloudflare, copy its UUID, uncomment, redeploy.
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "vibmehta-applications"
-# database_id = "PASTE-D1-UUID-HERE"
-# migrations_dir = "migrations"
+[[d1_databases]]
+binding = "DB"
+database_name = "vibmehta-applications"
+database_id = "f03a37ba-f4f1-43ac-a0be-7ba8f881585b"
+migrations_dir = "migrations"
 
 [[routes]]
 pattern = "vibmehta.com"
