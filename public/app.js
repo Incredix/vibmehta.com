@@ -25,6 +25,11 @@ if (year) year.textContent = new Date().getFullYear();
 setTourDateMin(document.getElementById("tourDate"));
 fillTourTimeSelect(document.querySelector("#tour-form select[name='tourTime']"));
 
+const params = new URLSearchParams(window.location.search);
+const wantsTour = params.get("tour") === "1";
+const tourIntentBanner = document.getElementById("tour-intent-banner");
+if (wantsTour && tourIntentBanner) tourIntentBanner.hidden = false;
+
 loadListings();
 
 form.addEventListener("submit", async (event) => {

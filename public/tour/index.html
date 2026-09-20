@@ -6,7 +6,7 @@
     <title>Schedule a tour · Theory</title>
     <meta
       name="description"
-      content="Request a tour for a Theory Company rental listing."
+      content="Complete a Theory Company rental application, then request a tour."
     />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -38,75 +38,22 @@
         <p class="eyebrow">In person</p>
         <h1>Schedule a tour.</h1>
         <p class="lede">
-          Choose a listing and a time that works for you. We’ll confirm by
-          email.
+          Complete an application first. After you submit, you can pick a day
+          and time for a tour.
         </p>
+        <aside class="req-banner">
+          <p>
+            <strong>Application required.</strong> Tours are offered after we
+            have your application on file.
+          </p>
+        </aside>
       </section>
 
-      <form id="tour-form" class="tour-form tour-page-form" novalidate>
-        <fieldset>
-          <legend>Tour details</legend>
-          <div class="grid">
-            <label class="span-2" id="listing-label">
-              Listing
-              <select id="listingId" name="listingId" required>
-                <option value="">Loading listings…</option>
-              </select>
-              <span id="listing-card" class="listing-card" hidden></span>
-            </label>
-            <label>
-              Preferred date
-              <input name="tourDate" id="tourDate" type="date" required />
-            </label>
-            <label>
-              Preferred time
-              <select name="tourTime" required>
-                <option value="">Choose a time</option>
-              </select>
-            </label>
-            <label>
-              Full name
-              <input name="fullName" type="text" required autocomplete="name" />
-            </label>
-            <label>
-              Email
-              <input name="email" type="email" required autocomplete="email" />
-            </label>
-            <label>
-              Phone
-              <input name="phone" type="tel" autocomplete="tel" />
-            </label>
-            <label class="span-2">
-              Notes (optional)
-              <input
-                name="notes"
-                type="text"
-                placeholder="Weekend preferred, bringing a roommate, etc."
-              />
-            </label>
-          </div>
-        </fieldset>
-
-        <label class="hp" aria-hidden="true">
-          Fax
-          <input name="fax" type="text" tabindex="-1" autocomplete="off" />
-        </label>
-
-        <p id="tour-error" class="form-error" hidden></p>
-
-        <div class="actions">
-          <button type="submit" id="tour-submit">Request tour</button>
-          <p class="fine">A Theory Company listing · theorycompany.com</p>
+      <section>
+        <p class="eyebrow">Listings</p>
+        <div id="listing-grid" class="listing-grid">
+          <p class="req-note">Loading listings…</p>
         </div>
-      </form>
-
-      <section id="tour-done" class="success" hidden>
-        <p class="eyebrow">Sent</p>
-        <h2>Tour request sent.</h2>
-        <p>
-          You’ll get a reply at the email you provided. You can also
-          <a href="/apply">start an application</a> anytime.
-        </p>
       </section>
     </main>
 
@@ -115,5 +62,6 @@
     </footer>
 
     <script type="module" src="/tour.js"></script>
+    <script src="/waitlist.js"></script>
   </body>
 </html>

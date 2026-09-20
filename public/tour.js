@@ -1,64 +1,15 @@
 import {
+  escapeAttr,
+  escapeHtml,
   fetchCatalog,
-  fillListingSelect,
-  fillTourTimeSelect,
-  setTourDateMin,
+  featuresOf,
 } from "/js/catalog.js";
 
-const form = document.getElementById("tour-form");
-const errorEl = document.getElementById("tour-error");
-const submitBtn = document.getElementById("tour-submit");
-const done = document.getElementById("tour-done");
-const listingSelect = document.getElementById("listingId");
-const listingCard = document.getElementById("listing-card");
-
+const grid = document.getElementById("listing-grid");
 const year = document.getElementById("year");
 if (year) year.textContent = new Date().getFullYear();
 
-setTourDateMin(document.getElementById("tourDate"));
-fillTourTimeSelect(document.querySelector("#tour-form select[name='tourTime']"));
-
 loadListings();
-
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  errorEl.hidden = true;
-
-  if (!form.reportValidity()) {
-    errorEl.textContent = "Please complete the required fields.";
-    errorEl.hidden = false;
-    return;
-  }
-
-  const data = Object.fromEntries(new FormData(form).entries());
-  const selected = listingSelect.selectedOptions[0];
-  if (selected) {
-    data.listingName = selected.dataset.name || selected.textContent;
-  }
-
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Sending…";
-
-  try {
-    const response = await fetch("/api/tour", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok || !payload.ok) {
-      throw new Error(payload.error || "Could not send the tour request.");
-    }
-    form.hidden = true;
-    done.hidden = false;
-    done.scrollIntoView({ behavior: "smooth", block: "start" });
-  } catch (err) {
-    errorEl.textContent = err.message;
-    errorEl.hidden = false;
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Request tour";
-  }
-});
 
 async function loadListings() {
   const params = new URLSearchParams(window.location.search);
@@ -66,13 +17,67 @@ async function loadListings() {
 
   try {
     const { listings } = await fetchCatalog();
-    const tourable = listings.filter((item) => (item.features?.tour ?? true) === true);
-    fillListingSelect(listingSelect, tourable, {
-      requested,
-      mode: "all",
-      card: listingCard,
-    });
+    if (!grid) return;
+
+    const tourable = listings.filter((item) => featuresOf(item).tour);
+    const ordered = requested
+      ? [
+          ...tourable.filter((item) => item.id === requested),
+          ...tourable.filter((item) => item.id !== requested),
+        ]
+      : tourable;
+
+    if (!ordered.length) {
+      grid.innerHTML = `<p class="req-note">No listings are taking tour requests right now.</p>`;
+      return;
+    }
+
+    grid.innerHTML = ordered.map(renderTourGateCard).join("");
   } catch {
-    listingSelect.innerHTML = `<option value="">Could not load listings</option>`;
+    if (grid) {
+      grid.innerHTML = `<p class="req-note">Could not load listings. <a href="/apply">Start an application</a>.</p>`;
+    }
   }
+}
+
+function renderTourGateCard(listing) {
+  const features = featuresOf(listing);
+  const id = encodeURIComponent(listing.id);
+  const name = escapeHtml(listing.publicName);
+  const location = escapeHtml(listing.publicLocation);
+  const facts = escapeHtml(listing.facts || "Residential rental");
+  const eyebrow =
+    listing.available === false ? `${location} · Unavailable` : location;
+
+  if (features.apply) {
+    return `
+      <article class="home-listing">
+        <span class="eyebrow">${eyebrow}</span>
+        <h2>${name}</h2>
+        <p>${facts}. Submit an application, then schedule your tour.</p>
+        <p class="listing-actions">
+          <a class="listing-cta" href="/apply?listing=${id}&tour=1">Complete application</a>
+        </p>
+      </article>`;
+  }
+
+  return `
+      <article class="home-listing">
+        <span class="eyebrow">${eyebrow}</span>
+        <h2>${name}</h2>
+        <p>${facts}. This listing isn’t open to apply yet. Join the waitlist and we’ll follow up when tours are available.</p>
+        <form class="waitlist-form" data-waitlist>
+          <input type="hidden" name="listingId" value="${escapeAttr(listing.id)}" />
+          <label>
+            Email
+            <input name="email" type="email" required autocomplete="email" placeholder="you@email.com" />
+          </label>
+          <button type="submit">Notify me</button>
+          <label class="hp" aria-hidden="true">
+            Fax
+            <input name="fax" type="text" tabindex="-1" autocomplete="off" />
+          </label>
+          <p class="waitlist-status" data-waitlist-status hidden></p>
+        </form>
+      </article>`;
 }

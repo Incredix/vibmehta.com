@@ -14,7 +14,7 @@ Theory Company rental site, hosted at [vibmehta.com](https://vibmehta.com). Bran
 | Private room | https://vibmehta.com/apply?listing=fremont-room (unavailable; waitlist) |
 | Manager inbox | https://vibmehta.com/admin |
 
-Tours, apply, and waitlist are driven by `src/listings.js`. Every listing gets the same feature set by default:
+Tours, apply, and waitlist are driven by `src/listings.js`. Tours are offered after an application is submitted — “Request a tour” sends people to apply first; the tour form appears on the success screen. Every listing gets the same feature set by default:
 
 - `available: true` → apply + tour
 - `available: false` → waitlist + tour

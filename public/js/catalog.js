@@ -127,7 +127,11 @@ export function renderListingCard(listing) {
       `<a class="listing-cta" href="/apply?listing=${id}">Start application</a>`,
     );
   }
-  if (features.tour) {
+  if (features.tour && features.apply) {
+    actions.push(
+      `<a class="listing-cta listing-cta-muted" href="/apply?listing=${id}&tour=1">Request a tour</a>`,
+    );
+  } else if (features.tour && !features.apply) {
     actions.push(
       `<a class="listing-cta listing-cta-muted" href="/tour?listing=${id}">Request a tour</a>`,
     );
@@ -174,7 +178,11 @@ export function renderHeroActions(featured) {
   if (features.apply) {
     parts.push(`<a class="btn" href="/apply?listing=${id}">Apply for this home</a>`);
   }
-  if (features.tour) {
+  if (features.tour && features.apply) {
+    parts.push(
+      `<a class="btn btn-secondary" href="/apply?listing=${id}&tour=1">Request a tour</a>`,
+    );
+  } else if (features.tour && !features.apply) {
     parts.push(
       `<a class="btn btn-secondary" href="/tour?listing=${id}">Request a tour</a>`,
     );
