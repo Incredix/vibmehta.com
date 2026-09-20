@@ -14,7 +14,12 @@ Theory Company rental site, hosted at [vibmehta.com](https://vibmehta.com). Bran
 | Private room | https://vibmehta.com/apply?listing=fremont-room (unavailable; waitlist) |
 | Landlord inbox | https://vibmehta.com/admin |
 
-Tours work for every listing (including unavailable ones). After a successful application, applicants can also request a tour. That emails you so you can confirm.
+Tours, apply, and waitlist are driven by `src/listings.js`. Every listing gets the same feature set by default:
+
+- `available: true` → apply + tour
+- `available: false` → waitlist + tour
+
+Override with `features: { apply, tour, waitlist }` on a listing when needed. Tour hours live in one place (`TOUR_TIMES`).
 
 ## Load this repo in Cloudflare
 
@@ -29,13 +34,13 @@ npx wrangler d1 migrations apply vibmehta-applications --remote
 
 5. Worker secrets/vars:
    - Secret `ADMIN_PASSWORD` — sign in at `/admin`
-   - Variable `LISTING_FREMONT_ADDRESS` — real street for the Fremont home
+   - Variable `LISTING_<ID>_ADDRESS` per listing (e.g. `LISTING_FREMONT_ADDRESS`)
    - Secrets `TCP_EMAIL_INGEST_URL` + `TCP_EMAIL_INGEST_SECRET` — send mail through TCP SES (no AWS keys on Cloudflare)
    - Optional live credit secrets below
 
-The public site shows listing names and city, not the street address. Set `available: false` on a listing in `src/listings.js` to show it as unavailable. Notify-me signups email the person immediately and again when that listing is marked available.
+Street addresses stay in env, not git. Notify-me emails the person immediately and again when that listing is marked available.
 
-To add another home, copy an entry in `src/listings.js` and set `LISTING_<ID>_ADDRESS` in Cloudflare / `.dev.vars`. The private room uses `LISTING_FREMONT_ADDRESS` unless `LISTING_FREMONT_ROOM_ADDRESS` is set.
+To add a listing: copy an entry in `src/listings.js`, optionally set `SITE.hero.featuredListingId`, and set `LISTING_<ID>_ADDRESS` in Cloudflare / `.dev.vars`. Use `addressFrom: "fremont"` to reuse another listing’s street address.
 
 ## Credit checks
 

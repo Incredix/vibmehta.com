@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Theory · Fremont rental</title>
+    <title>Theory · Rentals</title>
     <meta
       name="description"
-      content="A Theory Company listing in Fremont. Apply directly."
+      content="Theory Company rental listings. Apply and request a tour directly."
     />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -38,45 +38,16 @@
         <p class="eyebrow">Now available</p>
         <h1>A quiet home in Fremont.</h1>
         <p class="lede lede-serif">Handled directly.</p>
-        <p class="actions">
-          <a class="btn" href="/apply?listing=fremont">Apply for the home</a>
-          <a class="btn btn-secondary" href="/tour?listing=fremont">Request a tour</a>
+        <p class="actions" id="hero-actions">
+          <a class="btn" href="/apply">Apply</a>
+          <a class="btn btn-secondary" href="/tour">Request a tour</a>
         </p>
       </section>
 
       <section>
         <p class="eyebrow">Listings</p>
         <div id="listing-grid" class="listing-grid">
-          <article class="home-listing">
-            <span class="eyebrow">Fremont, CA</span>
-            <h2>Fremont home</h2>
-            <p>3 bed · 2 bath · single-family. Apply in a few minutes.</p>
-            <p class="listing-actions">
-              <a class="listing-cta" href="/apply?listing=fremont">Start application</a>
-              <a class="listing-cta listing-cta-muted" href="/tour?listing=fremont">Request a tour</a>
-            </p>
-          </article>
-          <article class="home-listing">
-            <span class="eyebrow">Fremont, CA · Unavailable</span>
-            <h2>Private room</h2>
-            <p>Single room · private entrance. Live listing — applications open when it’s available.</p>
-            <p class="listing-actions">
-              <a class="listing-cta listing-cta-muted" href="/tour?listing=fremont-room">Request a tour</a>
-            </p>
-            <form class="waitlist-form" data-waitlist>
-              <input type="hidden" name="listingId" value="fremont-room" />
-              <label>
-                Email
-                <input name="email" type="email" required autocomplete="email" placeholder="you@email.com" />
-              </label>
-              <button type="submit">Notify me</button>
-              <label class="hp" aria-hidden="true">
-                Fax
-                <input name="fax" type="text" tabindex="-1" autocomplete="off" />
-              </label>
-              <p class="waitlist-status" data-waitlist-status hidden></p>
-            </form>
-          </article>
+          <p class="req-note">Loading listings…</p>
         </div>
       </section>
 
@@ -132,7 +103,7 @@
       </div>
     </footer>
 
-    <script src="/home.js"></script>
+    <script type="module" src="/home.js"></script>
     <script src="/waitlist.js"></script>
   </body>
 </html>

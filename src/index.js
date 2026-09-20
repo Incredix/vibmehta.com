@@ -1,6 +1,6 @@
 import { login, logout, requireAdmin, sessionOk } from "./auth.js";
 import { creditProvider, runCredit } from "./credit.js";
-import { publicListings, resolveListing } from "./listings.js";
+import { publicListings, publicSite, resolveListing } from "./listings.js";
 import {
   getApplication,
   getApplicationForCredit,
@@ -90,7 +90,7 @@ export default {
           console.error("Waitlist notify failed", err);
         }
       }
-      return cors(json({ ok: true, listings: publicListings() }));
+      return cors(json({ ok: true, listings: publicListings(), site: publicSite() }));
     }
 
     if (pathname === "/api/apply") {
@@ -245,8 +245,8 @@ async function handleApply(request, env) {
     cleaned[key] = String(value ?? "").trim();
   }
 
-  const listing = resolveListing(env, cleaned.listingId, { requireAvailable: true });
-  if (!listing) {
+  const listing = resolveListing(env, cleaned.listingId);
+  if (!listing || listing.features?.apply === false) {
     return json({ ok: false, error: "Choose a listing that is currently available." }, 400);
   }
   cleaned.listingId = listing.id;
@@ -354,7 +354,7 @@ async function handleTour(request, env) {
   }
 
   const listing = resolveListing(env, listingId);
-  if (!listing) {
+  if (!listing || listing.features?.tour === false) {
     return json({ ok: false, error: "Choose a listing for the tour." }, 400);
   }
   const listingLabel = `${listing.publicName} · ${listing.publicLocation}`;
@@ -412,7 +412,10 @@ async function handleAvailabilityAlert(request, env) {
   if (!listing) {
     return json({ ok: false, error: "Choose a listing." }, 400);
   }
-  if (listing.available) {
+  if (listing.features?.waitlist === false) {
+    return json({ ok: false, error: "This listing does not take availability alerts." }, 400);
+  }
+  if (listing.available && listing.features?.apply !== false) {
     return json({ ok: false, error: "This listing is already open. Apply instead." }, 400);
   }
 

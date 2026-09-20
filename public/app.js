@@ -1,3 +1,11 @@
+import {
+  fetchCatalog,
+  fillListingSelect,
+  fillTourTimeSelect,
+  featuresOf,
+  setTourDateMin,
+} from "/js/catalog.js";
+
 const form = document.getElementById("application-form");
 const errorEl = document.getElementById("form-error");
 const success = document.getElementById("success");
@@ -11,14 +19,11 @@ const tourError = document.getElementById("tour-error");
 const tourSubmit = document.getElementById("tour-submit");
 const tourSkip = document.getElementById("tour-skip");
 
-document.getElementById("year").textContent = new Date().getFullYear();
+const year = document.getElementById("year");
+if (year) year.textContent = new Date().getFullYear();
 
-const tourDate = document.getElementById("tourDate");
-if (tourDate) {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tourDate.min = tomorrow.toISOString().slice(0, 10);
-}
+setTourDateMin(document.getElementById("tourDate"));
+fillTourTimeSelect(document.querySelector("#tour-form select[name='tourTime']"));
 
 loadListings();
 
@@ -123,20 +128,10 @@ async function loadListings() {
   const requested = (params.get("listing") || params.get("property") || "").toLowerCase();
 
   try {
-    const res = await fetch("/api/listings");
-    const payload = await res.json();
-    const listings = payload.listings || [];
-    listingSelect.innerHTML = "";
-
-    const open = listings.filter((item) => item.available !== false);
+    const { listings } = await fetchCatalog();
     const picked = listings.find((item) => item.id === requested);
 
-    if (!open.length) {
-      listingSelect.innerHTML = `<option value="">No listings available</option>`;
-      return;
-    }
-
-    if (picked && picked.available === false) {
+    if (picked && !featuresOf(picked).apply) {
       const panel = document.getElementById("waitlist-panel");
       const heading = document.getElementById("waitlist-heading");
       const listingIdInput = document.getElementById("waitlist-listing-id");
@@ -145,41 +140,12 @@ async function loadListings() {
       if (listingIdInput) listingIdInput.value = picked.id;
     }
 
-    if (open.length === 1) {
-      const listing = open[0];
-      listingSelect.innerHTML = `<option value="${escapeAttr(listing.id)}" selected>${escapeHtml(listing.publicName)}</option>`;
-      listingSelect.hidden = true;
-      listingCard.hidden = false;
-      listingCard.textContent = `${listing.publicName} · ${listing.publicLocation}`;
-      return;
-    }
-
-    listingSelect.append(new Option("Choose a listing", ""));
-    for (const listing of open) {
-      listingSelect.append(
-        new Option(`${listing.publicName} · ${listing.publicLocation}`, listing.id),
-      );
-    }
-
-    if (requested && open.some((item) => item.id === requested)) {
-      listingSelect.value = requested;
-    }
+    fillListingSelect(listingSelect, listings, {
+      requested,
+      mode: "apply",
+      card: listingCard,
+    });
   } catch {
-    listingSelect.innerHTML = `<option value="fremont" selected>Fremont home</option>`;
-    listingSelect.hidden = true;
-    listingCard.hidden = false;
-    listingCard.textContent = "Fremont home · Fremont, CA";
+    listingSelect.innerHTML = `<option value="">Could not load listings</option>`;
   }
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
-}
-
-function escapeAttr(value) {
-  return escapeHtml(value);
 }
