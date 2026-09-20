@@ -13,6 +13,8 @@ Theory Company rental site, hosted at [vibmehta.com](https://vibmehta.com). Bran
 | Private room | https://vibmehta.com/apply?listing=fremont-room (unavailable; waitlist) |
 | Landlord inbox | https://vibmehta.com/admin |
 
+After a successful application, applicants can request a tour (date + time). That emails you so you can confirm.
+
 ## Load this repo in Cloudflare
 
 1. Workers & Pages → Import **`Incredix/vibmehta.com`**. Deploy command is `npx wrangler deploy`.

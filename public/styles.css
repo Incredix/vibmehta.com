@@ -470,6 +470,46 @@ button:disabled {
   border: 1px solid var(--line);
 }
 
+.tour-block {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.tour-block h3 {
+  margin: 0 0 8px;
+  font-family: var(--serif);
+  font-size: 1.45rem;
+  font-weight: 500;
+}
+
+.tour-form {
+  margin-top: 16px;
+  padding-bottom: 0;
+}
+
+.btn-text {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 500;
+  padding: 8px 4px;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.btn-text:hover {
+  color: var(--ink);
+  background: transparent;
+}
+
+.tour-done {
+  margin: 24px 0 0;
+  color: var(--muted);
+}
+
 footer:not(.site-footer) {
   padding: 0 0 40px;
   color: var(--muted);

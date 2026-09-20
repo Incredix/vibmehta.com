@@ -105,6 +105,12 @@ export default {
       return cors(await handleAvailabilityAlert(request, env));
     }
 
+    if (pathname === "/api/tour") {
+      if (request.method === "OPTIONS") return cors(new Response(null, { status: 204 }));
+      if (request.method !== "POST") return cors(json({ ok: false, error: "Method not allowed" }, 405));
+      return cors(await handleTour(request, env));
+    }
+
     if (pathname.startsWith("/api/admin/")) {
       return handleAdmin(request, env, pathname);
     }
@@ -311,7 +317,89 @@ async function handleApply(request, env) {
     }
   }
 
-  return json({ ok: true, id: applicationId });
+  return json({
+    ok: true,
+    id: applicationId,
+    applicant: {
+      fullName: cleaned.fullName,
+      email: cleaned.email,
+      phone: cleaned.phone || "",
+      listingId: cleaned.listingId,
+      listingName: cleaned.listingName,
+    },
+  });
+}
+
+async function handleTour(request, env) {
+  const data = await readBody(request);
+  if (String(data.fax || data.website || "").trim()) {
+    return json({ ok: true });
+  }
+
+  const fullName = String(data.fullName || "").trim();
+  const email = String(data.email || "").trim();
+  const phone = String(data.phone || "").trim();
+  const listingId = String(data.listingId || "").trim();
+  const listingName = String(data.listingName || "").trim();
+  const tourDate = String(data.tourDate || "").trim();
+  const tourTime = String(data.tourTime || "").trim();
+  const notes = String(data.notes || "").trim();
+  const applicationId = String(data.applicationId || "").trim();
+
+  if (!fullName || !isEmail(email) || !tourDate || !tourTime) {
+    return json(
+      { ok: false, error: "Name, email, preferred date, and time are required." },
+      400,
+    );
+  }
+
+  const listing = resolveListing(env, listingId);
+  const listingLabel =
+    listingName ||
+    (listing ? `${listing.publicName} · ${listing.publicLocation}` : listingId) ||
+    "Fremont listing";
+
+  const submittedAt = new Date().toISOString();
+  const text = [
+    `Tour request from ${fullName}`,
+    "",
+    `Listing: ${listingLabel}`,
+    `Preferred date: ${tourDate}`,
+    `Preferred time: ${tourTime}`,
+    notes ? `Notes: ${notes}` : "",
+    "",
+    `Email: ${email}`,
+    phone ? `Phone: ${phone}` : "",
+    applicationId ? `Application id: ${applicationId}` : "",
+    `Submitted: ${submittedAt}`,
+    "",
+    "Confirm or suggest another time by replying to this email.",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  try {
+    await deliverEmail(env, {
+      subject: `Tour request — ${fullName} — ${tourDate} ${tourTime}`,
+      text,
+      html: `<!doctype html><html><body style="font-family:Georgia,serif;color:#1c1916;">
+        <p><strong>Tour request</strong> from ${escapeHtml(fullName)}</p>
+        <p>Listing: ${escapeHtml(listingLabel)}</p>
+        <p>Preferred: <strong>${escapeHtml(tourDate)}</strong> · <strong>${escapeHtml(tourTime)}</strong></p>
+        ${notes ? `<p>Notes: ${escapeHtml(notes)}</p>` : ""}
+        <p>Email: <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
+        ${phone ? `<p>Phone: ${escapeHtml(phone)}</p>` : ""}
+        <p style="color:#7a7368;">Reply to confirm or suggest another time.</p>
+      </body></html>`,
+      replyTo: email,
+      applicantName: fullName,
+    });
+  } catch (err) {
+    console.error("Tour request email failed", err);
+    return json({ ok: false, error: "Could not send the tour request. Try again." }, 502);
+  }
+
+  return json({ ok: true });
 }
 
 async function handleAvailabilityAlert(request, env) {
